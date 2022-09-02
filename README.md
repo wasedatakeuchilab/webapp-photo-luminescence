@@ -41,8 +41,7 @@ $ uvicorn webapp_photo_luminescence:server
 You can also run the app as a Docker container.
 
 ```sh
-$ docker pull wasedatakeuchilab/webapp-photo-luminescence  # Pull a image
-$ docker build -t app .  # Build a image
+$ docker run --port 8080:8080 wasedatakeuchilab/webapp-photo-luminescence
 ```
 
 ## Setup dev environment
