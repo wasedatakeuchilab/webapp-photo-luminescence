@@ -1,11 +1,11 @@
 # Web Application for Photo Luminescence Measurement <!-- omit in toc -->
 
 <p align="center">
-<a href="https://github.com/wasedatakeuchilab/webapp_photo_luminescence/actions?query=workflow%3ATest" target="_blank">
-    <img src="https://github.com/wasedatakeuchilab/webapp_photo_luminescence/workflows/Test/badge.svg" alt="Test">
+<a href="https://github.com/wasedatakeuchilab/webapp-photo-luminescence/actions?query=workflow%3ATest" target="_blank">
+    <img src="https://github.com/wasedatakeuchilab/webapp-photo-luminescence/workflows/Test/badge.svg" alt="Test">
 </a>
-<a href="https://codecov.io/gh/wasedatakeuchilab/webapp_photo_luminescence" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/webapp_photo_luminescence?color=%2334D058" alt="Coverage">
+<a href="https://codecov.io/gh/wasedatakeuchilab/webapp-photo-luminescence" target="_blank">
+    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/webapp-photo-luminescence?color=%2334D058" alt="Coverage">
 </a>
 </p>
 
@@ -25,7 +25,7 @@ This repository provides a web application for PL mesurements, with intuisive UI
 Python 3.10 or above is required.
 
 ```sh
-$ pip install git+https://github.com/wasedatakeuchilab/webapp_photo_luminescence
+$ pip install git+https://github.com/wasedatakeuchilab/webapp-photo-luminescence
 ```
 
 ## Run app
