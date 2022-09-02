@@ -1,15 +1,15 @@
 # Web Application for Photo Luminescence Measurement <!-- omit in toc -->
 
 <p align="center">
-<a href="https://github.com/wasedatakeuchilab/webapp_photo_luminescence/actions?query=workflow%3ATest" target="_blank">
-    <img src="https://github.com/wasedatakeuchilab/webapp_photo_luminescence/workflows/Test/badge.svg" alt="Test">
+<a href="https://github.com/wasedatakeuchilab/webapp-photo-luminescence/actions?query=workflow%3ATest" target="_blank">
+    <img src="https://github.com/wasedatakeuchilab/webapp-photo-luminescence/workflows/Test/badge.svg" alt="Test">
 </a>
-<a href="https://codecov.io/gh/wasedatakeuchilab/webapp_photo_luminescence" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/webapp_photo_luminescence?color=%2334D058" alt="Coverage">
+<a href="https://codecov.io/gh/wasedatakeuchilab/webapp-photo-luminescence" target="_blank">
+    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/webapp-photo-luminescence?color=%2334D058" alt="Coverage">
 </a>
 </p>
 
-This repository provides a web application for PL mesurements, with intuisive UI and high level operation to data.
+This repository provides a web application for PL mesurements, with intuisive UI and high level operations to data.
 
 - [Installation](#installation)
 - [Run app](#run-app)
@@ -25,7 +25,7 @@ This repository provides a web application for PL mesurements, with intuisive UI
 Python 3.10 or above is required.
 
 ```sh
-$ pip install git+https://github.com/wasedatakeuchilab/webapp_photo_luminescence
+$ pip install git+https://github.com/wasedatakeuchilab/webapp-photo-luminescence
 ```
 
 ## Run app
@@ -41,8 +41,7 @@ $ uvicorn webapp_photo_luminescence:server
 You can also run the app as a Docker container.
 
 ```sh
-$ docker pull wasedatakeuchilab/webapp-photo-luminescence  # Pull a image
-$ docker build -t app .  # Build a image
+$ docker run --rm -p 8080:8080 wasedatakeuchilab/webapp-photo-luminescence
 ```
 
 ## Setup dev environment
@@ -78,3 +77,5 @@ $ pytest
 ## License
 
 [MIT License](./LICENSE)
+
+Copyright (c) 2022 Shuhei Nitta
