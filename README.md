@@ -77,3 +77,5 @@ $ pytest
 ## License
 
 [MIT License](./LICENSE)
+
+Copyright (c) 2022 Shuhei Nitta
