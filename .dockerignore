@@ -1,0 +1,6 @@
+*
+!pyproject.toml
+!poetry.lock
+!src
+!README.md
+!LICENSE
