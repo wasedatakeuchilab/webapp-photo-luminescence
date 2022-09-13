@@ -1,5 +1,6 @@
 import os
 import typing as t
+from collections import abc
 
 import dash
 import dash_bootstrap_components as dbc
@@ -102,7 +103,7 @@ def update_table(
     wavelength_range: list[int],
     fitting: bool,
     normalize_intensity: bool,
-) -> list[dict[str, t.Any]] | None:
+) -> list[dict[abc.Hashable, t.Any]] | None:
     if not selected_items:
         return None
     filepaths = ds.get_existing_item_filepaths(
