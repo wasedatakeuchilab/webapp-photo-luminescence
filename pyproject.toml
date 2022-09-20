@@ -44,6 +44,9 @@ doc = []
 [tool.hatch.version]
 path = "src/webapp_photo_luminescence/__init__.py"
 
+[tool.hatch.metadata]
+allow-direct-references = true
+
 [tool.mypy]
 python_version = "3.10"
 strict = true
