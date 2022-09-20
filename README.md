@@ -15,7 +15,7 @@ This repository provides a web application for PL mesurements, with intuisive UI
 - [Run app](#run-app)
 - [Docker image](#docker-image)
 - [Setup dev environment](#setup-dev-environment)
-  - [Install Poetry and dependencies](#install-poetry-and-dependencies)
+  - [Install dependencies](#install-dependencies)
   - [Install pre-commit](#install-pre-commit)
   - [Run tests](#run-tests)
 - [License](#license)
@@ -25,7 +25,7 @@ This repository provides a web application for PL mesurements, with intuisive UI
 Python 3.10 or above is required.
 
 ```sh
-$ pip install git+https://github.com/wasedatakeuchilab/webapp-photo-luminescence
+pip install git+https://github.com/wasedatakeuchilab/webapp-photo-luminescence
 ```
 
 ## Run app
@@ -33,7 +33,7 @@ $ pip install git+https://github.com/wasedatakeuchilab/webapp-photo-luminescence
 The [WSGI](https://wsgi.readthedocs.io/en/latest/) is `webapp_photo_luminescence:server`.
 
 ```sh
-$ uvicorn webapp_photo_luminescence:server
+uvicorn webapp_photo_luminescence:server
 ```
 
 ## Docker image
@@ -41,21 +41,15 @@ $ uvicorn webapp_photo_luminescence:server
 You can also run the app as a Docker container.
 
 ```sh
-$ docker run --rm -p 8080:8080 wasedatakeuchilab/webapp-photo-luminescence
+docker run --rm -p 8080:8080 wasedatakeuchilab/webapp-photo-luminescence
 ```
 
 ## Setup dev environment
 
-### Install Poetry and dependencies
-
-The dependencies are managed with [Poetry](https://python-poetry.org/docs/) in this project.
+### Install dependencies
 
 ```sh
-$ pip install poetry~=1.2.0
-$ poetry config virtualenvs.create false # Recommended if you work in a container
-$ poetry shell  # No need if you run the previous line
-$ poetry self install  # Install addons
-$ poetry install # Install dependencies
+pip install -e .[dev,test]
 ```
 
 ### Install pre-commit
@@ -63,7 +57,7 @@ $ poetry install # Install dependencies
 [pre-commit](https://pre-commit.com/) enables to execute linting and type-checking before committing.
 
 ```sh
-$ pre-commit install
+pre-commit install
 ```
 
 ### Run tests
@@ -71,7 +65,7 @@ $ pre-commit install
 Run unit tests using [pytest](https://docs.pytest.org/en/7.1.x/contents.html).
 
 ```sh
-$ pytest
+pytest
 ```
 
 ## License
