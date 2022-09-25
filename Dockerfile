@@ -1,9 +1,8 @@
 FROM python:3.10-bullseye as builder
-RUN pip install -U pip \
- && pip install gunicorn
+RUN pip install -U pip
 WORKDIR /work
 COPY . /work
-RUN pip install .
+RUN pip install .[pro]
 
 FROM python:3.10-slim-bullseye as runner
 RUN useradd takeuchilab
