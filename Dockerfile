@@ -2,7 +2,7 @@ FROM python:3.10-bullseye as builder
 RUN pip install -U pip
 WORKDIR /work
 COPY . /work
-RUN pip install .[pro]
+RUN pip install .[prod]
 
 FROM python:3.10-slim-bullseye as runner
 RUN useradd takeuchilab

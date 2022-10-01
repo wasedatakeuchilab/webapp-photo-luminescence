@@ -41,7 +41,7 @@ dev = [
   "pre-commit~=2.20.0",
 ]
 doc = []
-pro = [
+prod = [
   "gunicorn~=20.1.0",
 ]
 
