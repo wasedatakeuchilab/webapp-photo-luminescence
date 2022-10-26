@@ -19,6 +19,7 @@ dependencies = [
   "pandas~=1.5.1",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.1.1",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.1",
+  "asgiref~=3.5.2",
 ]
 dynamic = ["version"]
 

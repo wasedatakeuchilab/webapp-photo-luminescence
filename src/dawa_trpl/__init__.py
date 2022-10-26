@@ -4,6 +4,7 @@ import pathlib
 
 import dash
 import dash_bootstrap_components as dbc
+from asgiref import wsgi
 
 from . import config, powerpoint
 from .components import tabs, upload_bar
@@ -17,7 +18,7 @@ app = dash.Dash(
     suppress_callback_exceptions=True,
 )
 
-server = app.server
+server = wsgi.WsgiToAsgi(app.server)  # type: ignore[no-untyped-call]
 
 navbar = dbc.Navbar(
     [
