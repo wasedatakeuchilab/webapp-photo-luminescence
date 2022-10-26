@@ -6,8 +6,8 @@ import pathlib
 import dash
 import pytest
 
+from dawa_trpl.components import upload_bar
 from tests import IMGDIR, FixtureRequest
-from webapp_photo_luminescence.components import upload_bar
 
 
 def test_update_upload_dir_when_upload_dir_already_exists(

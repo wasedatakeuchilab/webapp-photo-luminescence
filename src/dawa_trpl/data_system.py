@@ -6,7 +6,7 @@ from collections import abc
 import numpy as np
 import tlab_analysis.photo_luminescence as pl
 
-from webapp_photo_luminescence import config
+from dawa_trpl import config
 
 
 def validate_upload_dir(upload_dir: str | None) -> str:

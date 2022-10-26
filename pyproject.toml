@@ -3,8 +3,8 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "webapp-photo-luminescence"
-description = "A web application for photo luminescence measurement"
+name = "dawa-trpl"
+description = "A web application for TRPL measurement"
 readme = "README.md"
 requires-python = "~=3.10"
 license = "MIT"
@@ -24,7 +24,7 @@ dynamic = ["version"]
 
 [project.urls]
 Documentation = ""
-Homepage = "https://github.com/wasedatakeuchilab/webapp-photo-luminescence"
+Homepage = "https://github.com/wasedatakeuchilab/dawa-trpl"
 
 [project.optional-dependencies]
 test = [
@@ -47,7 +47,7 @@ prod = [
 ]
 
 [tool.hatch.version]
-path = "src/webapp_photo_luminescence/__init__.py"
+path = "src/dawa_trpl/__init__.py"
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -69,7 +69,7 @@ ignore_missing_imports = true
 profile = "black"
 
 [tool.pytest.ini_options]
-addopts = "--cov=webapp_photo_luminescence"
+addopts = "--cov=dawa_trpl"
 testpaths = ["tests"]
 
 [tool.coverage.run]

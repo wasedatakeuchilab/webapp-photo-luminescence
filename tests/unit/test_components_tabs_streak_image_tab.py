@@ -7,7 +7,7 @@ import dash
 import plotly.graph_objects as go
 import pytest
 
-from webapp_photo_luminescence.components.tabs import streak_image_tab
+from dawa_trpl.components.tabs import streak_image_tab
 
 
 @pytest.fixture()
@@ -17,9 +17,7 @@ def selected_items() -> list[str]:
 
 @pytest.fixture()
 def process_mock() -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch(
-        "webapp_photo_luminescence.components.tabs.streak_image_tab.process"
-    ) as m:
+    with mock.patch("dawa_trpl.components.tabs.streak_image_tab.process") as m:
         yield m
 
 
@@ -28,9 +26,7 @@ def ds_mock(
     selected_items: list[str],
     upload_dir: str,
 ) -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch(
-        "webapp_photo_luminescence.components.tabs.streak_image_tab.ds"
-    ) as m:
+    with mock.patch("dawa_trpl.components.tabs.streak_image_tab.ds") as m:
         m.get_existing_item_filepaths.return_value = [
             os.path.join(upload_dir, item) for item in selected_items
         ]

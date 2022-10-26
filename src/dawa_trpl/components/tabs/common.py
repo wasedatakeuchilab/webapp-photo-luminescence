@@ -3,7 +3,7 @@ import typing as t
 import dash_bootstrap_components as dbc
 from dash import dash_table, dcc
 
-from webapp_photo_luminescence import typing
+from dawa_trpl import typing
 
 
 def create_graph(**kwargs: t.Any) -> dcc.Graph:

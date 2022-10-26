@@ -7,9 +7,9 @@ import dash
 import pytest
 import tlab_analysis.photo_luminescence as pl
 
+from dawa_trpl import data_system as ds
+from dawa_trpl import powerpoint
 from tests import IMGDIR, FixtureRequest
-from webapp_photo_luminescence import data_system as ds
-from webapp_photo_luminescence import powerpoint
 
 
 @pytest.fixture(scope="module", params=[path.name for path in IMGDIR.glob("*.img")])
@@ -35,7 +35,7 @@ def ds_mock(
     time_resolved: pl.TimeResolved,
     wavelength_resolved: pl.WavelengthResolved,
 ) -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch("webapp_photo_luminescence.powerpoint.ds") as m:
+    with mock.patch("dawa_trpl.powerpoint.ds") as m:
         m.get_existing_item_filepaths.return_value = ["item.img"]
         m.load_pldata.return_value = pldata
         m.load_time_resolved.return_value = time_resolved

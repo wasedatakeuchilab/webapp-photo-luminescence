@@ -5,8 +5,8 @@ from unittest import mock
 import pytest
 import tlab_analysis.photo_luminescence as pl
 
+from dawa_trpl import data_system as ds
 from tests import IMGDIR, FixtureRequest
-from webapp_photo_luminescence import data_system as ds
 
 
 def test_validate_upload_dir_with_valid_upload_dir(
@@ -113,7 +113,7 @@ def filepaths(request: FixtureRequest[str]) -> list[str]:
 
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
-@mock.patch("webapp_photo_luminescence.data_system.load_time_resolved")
+@mock.patch("dawa_trpl.data_system.load_time_resolved")
 def test_load_time_resolveds(
     load_time_resolved_mock: mock.Mock,
     filepaths: list[str],
@@ -178,7 +178,7 @@ def test_load_wavelength_resolved_with_normalize_intensity(
 
 @pytest.mark.parametrize("fitting", [True, False])
 @pytest.mark.parametrize("normalize_intensity", [True, False])
-@mock.patch("webapp_photo_luminescence.data_system.load_wavelength_resolved")
+@mock.patch("dawa_trpl.data_system.load_wavelength_resolved")
 def test_load_wavelength_resolveds(
     load_wavelength_resolved_mock: mock.Mock,
     filepaths: list[str],

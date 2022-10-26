@@ -1,11 +1,11 @@
-# Web Application for Photo Luminescence Measurement <!-- omit in toc -->
+# Web Application for TRPL measurement <!-- omit in toc -->
 
 <p align="center">
-<a href="https://github.com/wasedatakeuchilab/webapp-photo-luminescence/actions?query=workflow%3ATest" target="_blank">
-    <img src="https://github.com/wasedatakeuchilab/webapp-photo-luminescence/workflows/Test/badge.svg" alt="Test">
+<a href="https://github.com/wasedatakeuchilab/dawa-trpl/actions?query=workflow%3ATest" target="_blank">
+    <img src="https://github.com/wasedatakeuchilab/dawa-trpl/workflows/Test/badge.svg" alt="Test">
 </a>
-<a href="https://codecov.io/gh/wasedatakeuchilab/webapp-photo-luminescence" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/webapp-photo-luminescence?color=%2334D058" alt="Coverage">
+<a href="https://codecov.io/gh/wasedatakeuchilab/dawa-trpl" target="_blank">
+    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/dawa-trpl?color=%2334D058" alt="Coverage">
 </a>
 </p>
 
@@ -25,23 +25,23 @@ This repository provides a web application for PL mesurements, with intuisive UI
 Python 3.10 or above is required.
 
 ```sh
-pip install git+https://github.com/wasedatakeuchilab/webapp-photo-luminescence
+pip install git+https://github.com/wasedatakeuchilab/dawa-trpl
 ```
 
 ## Run app
 
-The [WSGI](https://wsgi.readthedocs.io/en/latest/) is `webapp_photo_luminescence:server`.
+The [WSGI](https://wsgi.readthedocs.io/en/latest/) is `dawa_trpl:server`.
 
 ```sh
-uvicorn webapp_photo_luminescence:server
+uvicorn dawa_trpl:server
 ```
 
 ## Docker image
 
-You can also run the app as [a Docker container](https://hub.docker.com/repository/docker/wasedatakeuchilab/webapp-photo-luminescence).
+You can also run the app as [a Docker container](https://hub.docker.com/repository/docker/wasedatakeuchilab/dawa-trpl).
 
 ```sh
-docker run -it -p 8080:80 ghcr.io/wasedatakeuchilab/webapp-photo-luminescence
+docker run -it -p 8080:80 ghcr.io/wasedatakeuchilab/dawa-trpl
 ```
 
 ## Setup dev environment

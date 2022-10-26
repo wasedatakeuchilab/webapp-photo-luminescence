@@ -23,7 +23,7 @@ navbar = dbc.Navbar(
     [
         dbc.NavbarBrand(
             [
-                "Photo Luminescence ",
+                "TRPL ",
                 dash.html.Small("v" + __version__),
             ],
             href="/",

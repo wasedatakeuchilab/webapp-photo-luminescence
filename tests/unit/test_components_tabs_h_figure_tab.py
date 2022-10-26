@@ -8,8 +8,8 @@ import plotly.graph_objects as go
 import pytest
 import tlab_analysis.photo_luminescence as pl
 
+from dawa_trpl.components.tabs import h_figure_tab
 from tests import IMGDIR
-from webapp_photo_luminescence.components.tabs import h_figure_tab
 
 
 @pytest.fixture()
@@ -26,9 +26,7 @@ def trs() -> list[pl.TimeResolved]:
 
 @pytest.fixture()
 def process_mock() -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch(
-        "webapp_photo_luminescence.components.tabs.h_figure_tab.process"
-    ) as m:
+    with mock.patch("dawa_trpl.components.tabs.h_figure_tab.process") as m:
         yield m
 
 
@@ -38,7 +36,7 @@ def ds_mock(
     selected_items: list[str],
     upload_dir: str,
 ) -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch("webapp_photo_luminescence.components.tabs.h_figure_tab.ds") as m:
+    with mock.patch("dawa_trpl.components.tabs.h_figure_tab.ds") as m:
         m.load_time_resolveds.return_value = trs
         m.get_existing_item_filepaths.return_value = [
             os.path.join(upload_dir, item) for item in selected_items
