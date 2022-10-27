@@ -11,9 +11,9 @@ import plotly.graph_objects as go
 import tlab_pptx
 from dash import dcc
 
-from webapp_photo_luminescence import data_system as ds
-from webapp_photo_luminescence.components import upload_bar
-from webapp_photo_luminescence.components.tabs import h_figure_tab, v_figure_tab
+from dawa_trpl import data_system as ds
+from dawa_trpl.components import upload_bar
+from dawa_trpl.components.tabs import h_figure_tab, v_figure_tab
 
 download = dcc.Download("pptx-download")
 download_button = dbc.Button(

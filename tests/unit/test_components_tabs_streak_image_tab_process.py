@@ -2,8 +2,8 @@ import plotly.graph_objects as go
 import pytest
 import tlab_analysis.photo_luminescence as pl
 
+from dawa_trpl.components.tabs.streak_image_tab import process
 from tests import IMGDIR
-from webapp_photo_luminescence.components.tabs.streak_image_tab import process
 
 
 @pytest.fixture()

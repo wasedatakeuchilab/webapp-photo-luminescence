@@ -7,8 +7,8 @@ import dash
 import dash_bootstrap_components as dbc
 from dash import dcc
 
-from webapp_photo_luminescence import config
-from webapp_photo_luminescence import data_system as ds
+from dawa_trpl import config
+from dawa_trpl import data_system as ds
 
 upload_button = dbc.Button(
     "Upload Files", id="upload-button", color="primary", className="my-2"

@@ -10,7 +10,7 @@ from tests import FixtureRequest
 @pytest.fixture(scope="module", autouse=True)
 def upload_basedir() -> abc.Generator[str, None, None]:
     with tempfile.TemporaryDirectory() as tmpdir:
-        with mock.patch("webapp_photo_luminescence.config.UPLOAD_BASEDIR", tmpdir):
+        with mock.patch("dawa_trpl.config.UPLOAD_BASEDIR", tmpdir):
             yield tmpdir
 
 

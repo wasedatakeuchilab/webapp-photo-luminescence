@@ -7,10 +7,10 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 from dash import dcc
 
-from webapp_photo_luminescence import data_system as ds
-from webapp_photo_luminescence.components import upload_bar
-from webapp_photo_luminescence.components.tabs import common
-from webapp_photo_luminescence.components.tabs.streak_image_tab import process
+from dawa_trpl import data_system as ds
+from dawa_trpl.components import upload_bar
+from dawa_trpl.components.tabs import common
+from dawa_trpl.components.tabs.streak_image_tab import process
 
 img_download = dcc.Download("img-download")
 img_download_button = dbc.Button(
