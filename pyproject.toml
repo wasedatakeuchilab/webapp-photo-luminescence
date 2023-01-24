@@ -14,12 +14,12 @@ authors = [
 keywords = []
 classifiers = []
 dependencies = [
-  "dash~=2.7.0",
-  "dash-bootstrap-components~=1.3.0",
+  "dash~=2.6.1",
+  "dash-bootstrap-components~=1.2.1",
   "pandas~=1.5.1",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.1.1",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.1",
-  "asgiref~=3.6.0",
+  "asgiref~=3.5.2",
 ]
 dynamic = ["version"]
 
@@ -33,18 +33,18 @@ test = [
   "pytest-cov~=4.0.0",
   "pytest-describe~=2.0.1",
   "mypy~=0.971",
-  "flake8~=6.0.0",
-  "isort~=5.11.4",
-  "black~=22.12.0",
+  "flake8~=5.0.4",
+  "isort~=5.10.1",
+  "black~=22.10.0",
   "pandas-stubs~=1.5.1",
 ]
 dev = [
-  "pre-commit~=3.0.0",
-  "uvicorn~=0.20.0",
+  "pre-commit~=2.20.0",
+  "uvicorn~=0.19.0",
 ]
 doc = []
 prod = [
-  "uvicorn~=0.20.0",
+  "uvicorn~=0.19.0",
 ]
 
 [tool.hatch.version]
