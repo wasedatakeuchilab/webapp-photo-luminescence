@@ -122,7 +122,7 @@ def test_load_time_resolveds(
     trs = [mock.Mock(spec_set=pl.TimeResolved) for _ in filepaths]
     load_time_resolved_mock.side_effect = trs
     assert ds.load_time_resolveds(filepaths, normalize_intensity) == trs
-    for (call, filepath) in zip(
+    for call, filepath in zip(
         load_time_resolved_mock.call_args_list, filepaths, strict=True
     ):
         assert call == mock.call(filepath, normalize_intensity=normalize_intensity)
@@ -197,7 +197,7 @@ def test_load_wavelength_resolveds(
         )
         == wrs
     )
-    for (call, filepath) in zip(
+    for call, filepath in zip(
         load_wavelength_resolved_mock.call_args_list, filepaths, strict=True
     ):
         assert call == mock.call(
