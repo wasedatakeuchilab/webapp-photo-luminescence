@@ -47,7 +47,7 @@ def test_update_streak_image_when_items_are_selected(
         ds_mock.validate_upload_dir.return_value,
     )
     filepaths = ds_mock.get_existing_item_filepaths.return_value
-    for (call, filepath) in zip(ds_mock.load_pldata.call_args_list, filepaths):
+    for call, filepath in zip(ds_mock.load_pldata.call_args_list, filepaths):
         assert call == mock.call(filepath)
     process_mock.create_figure.assert_called_once_with(
         {
