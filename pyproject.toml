@@ -39,7 +39,7 @@ test = [
   "pandas-stubs~=1.5.1",
 ]
 dev = [
-  "pre-commit~=3.0.4",
+  "pre-commit~=3.1.1",
   "uvicorn~=0.20.0",
 ]
 doc = []
