@@ -11,14 +11,14 @@ license = "MIT"
 authors = [
   { name = "Shuhei Nitta", email = "huisintheta@gmail.com" }
 ]
-keywords = []
-classifiers = []
+# keywords = []
+# classifiers = []
 dependencies = [
-  "dash~=2.9.1",
-  "dash-bootstrap-components~=1.4.0",
-  "pandas~=1.5.1",
-  "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.1.1",
-  "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.1",
+  "dash~=2.9.2",
+  "dash-bootstrap-components~=1.4.1",
+  "pandas~=1.5.3",
+  "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.2.2",
+  "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.2",
   "asgiref~=3.6.0",
 ]
 dynamic = ["version"]
@@ -29,33 +29,42 @@ Homepage = "https://github.com/wasedatakeuchilab/dawa-trpl"
 
 [project.optional-dependencies]
 test = [
-  "pytest~=7.2.0",
-  "pytest-cov~=4.0.0",
-  "pytest-describe~=2.0.1",
-  "mypy~=1.0",
-  "flake8~=5.0.4",
-  "isort~=5.12.0",
-  "black~=23.1.0",
-  "pandas-stubs~=1.5.1",
+  "pytest==7.2.2",
+  "pytest-cov==4.0.0",
+  "pytest-describe==2.0.1",
+  "pytest-mock==3.10.0",
+  "mypy==1.1.1",
+  "flake8==6.0.0",
+  "isort==5.12.0",
+  "black==23.3.0",
 ]
-dev = [
-  "pre-commit~=3.2.0",
-  "uvicorn~=0.21.0",
+stub = [
+  "pandas-stubs~=1.5.3",
 ]
 doc = []
-prod = [
-  "uvicorn~=0.21.0",
-]
 
 [tool.hatch.version]
 path = "src/dawa_trpl/__init__.py"
+
+[tool.hatch.envs.test]
+features = ["test", "stub"]
+
+[tool.hatch.envs.test.scripts]
+test = "scripts/test.sh {args}"
+format = "scripts/format.sh {args}"
+lint = "scripts/lint.sh {args}"
+
+[tool.hatch.envs.doc]
+features = ["doc"]
+
+[tool.hatch.envs.doc.scripts]
 
 [tool.hatch.metadata]
 allow-direct-references = true
 
 [tool.mypy]
-python_version = "3.10"
 strict = true
+sqlite_cache = true
 disallow_untyped_decorators = false
 
 [[tool.mypy.overrides]]
@@ -71,7 +80,6 @@ profile = "black"
 
 [tool.pytest.ini_options]
 addopts = "--cov=dawa_trpl"
-testpaths = ["tests"]
 
 [tool.coverage.run]
 omit = ["*/__main__.py"]
