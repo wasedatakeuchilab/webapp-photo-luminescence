@@ -29,7 +29,7 @@ Homepage = "https://github.com/wasedatakeuchilab/dawa-trpl"
 
 [project.optional-dependencies]
 test = [
-  "pytest==7.2.2",
+  "pytest==7.3.0",
   "pytest-cov==4.0.0",
   "pytest-describe==2.0.1",
   "pytest-mock==3.10.0",
