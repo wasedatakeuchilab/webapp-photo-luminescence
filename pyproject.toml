@@ -16,7 +16,7 @@ authors = [
 dependencies = [
   "dash~=2.9.2",
   "dash-bootstrap-components~=1.4.1",
-  "pandas~=1.5.3",
+  "pandas~=2.0.1",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.2.2",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.2",
   "asgiref~=3.6.0",
