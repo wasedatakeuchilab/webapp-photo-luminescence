@@ -96,7 +96,7 @@ def _fit_to_wavelength_resolved(wr: pl.WavelengthResolved) -> pl.WavelengthResol
     max_intensity = wr.df["intensity"].max()
     wr.df["intensity"] /= max_intensity
     params, cov = wr.fit(_double_exponential, bounds=(0.0, np.inf))  # type: ignore
-    fast, slow = sorted((params[:2], params[2:]), key=lambda x: x[1])  # type: ignore
+    fast, slow = sorted((params[:2], params[2:]), key=lambda x: x[1])
     a = int(fast[0] / (fast[0] + slow[0]) * 100)
     wr.df.attrs["fit"] = {
         "a": a,
