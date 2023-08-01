@@ -5,11 +5,11 @@ from collections import abc
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import tlab_analysis.photo_luminescence as pl
+from tlab_analysis import utils
 
 
-def create_figure(trs: abc.Iterable[pl.TimeResolved]) -> go.Figure:
-    df = pd.concat([tr.df for tr in trs])
+def create_figure(dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
+    df = pd.concat(dfs)
     fig = (
         px.line(
             df,
@@ -36,44 +36,54 @@ def create_figure(trs: abc.Iterable[pl.TimeResolved]) -> go.Figure:
     return fig
 
 
-def add_peak_vline(fig: go.Figure, trs: abc.Iterable[pl.TimeResolved]) -> go.Figure:
-    def _add_peak_vline(fig: go.Figure, tr: pl.TimeResolved) -> go.Figure:
+def add_peak_vline(fig: go.Figure, dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
+    def _add_peak_vline(fig: go.Figure, df: pd.DataFrame) -> go.Figure:
+        peak = utils.find_peak(
+            df["wavelength"].to_list(),
+            df["smoothed_intensity"].to_list(),
+        )
         return fig.add_vline(
-            tr.peak_wavelength,
+            peak[0],
             annotation=dict(
-                text=f"Wavelength: {tr.peak_wavelength:.2f} nm",
-                hovertext=f"Intensity: {tr.peak_intensity:.4g}",
+                text=f"Wavelength: {peak[0]:.2f} nm",
+                hovertext=f"Intensity: {peak[1]:.4g}",
             ),
         )
 
-    return functools.reduce(_add_peak_vline, trs, fig)
+    return functools.reduce(_add_peak_vline, dfs, fig)
 
 
-def add_FWHM_range(fig: go.Figure, trs: abc.Iterable[pl.TimeResolved]) -> go.Figure:
-    def _add_FWHM_range(
-        fig: go.Figure, tr: pl.TimeResolved, fillcolor: str
-    ) -> go.Figure:
+def add_FWHM_range(fig: go.Figure, dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
+    def _add_FWHM_range(fig: go.Figure, df: pd.DataFrame, fillcolor: str) -> go.Figure:
+        half_range = utils.find_half_range(
+            df["wavelength"].to_list(),
+            df["smoothed_intensity"].to_list(),
+        )
+        FWHM = utils.find_FWHM(
+            df["wavelength"].to_list(),
+            df["smoothed_intensity"].to_list(),
+        )
         return fig.add_vrect(
-            *tr.half_range,
+            *half_range,
             fillcolor=fillcolor,
             opacity=0.10,
             annotation=dict(
-                text=f"FWHM: {tr.FWHM:.3g} nm",
+                text=f"FWHM: {FWHM:.3g} nm",
                 hovertext=""
-                f"Left: {tr.half_range[0]:.2f} nm<br>"
-                f"Right: {tr.half_range[1]:.2f} nm",
+                f"Left: {half_range[0]:.2f} nm<br>"
+                f"Right: {half_range[1]:.2f} nm",
                 xanchor="left",
             ),
         )
 
     def _add_FWFM_range_wrapper(
-        fig: go.Figure, tr_and_color: tuple[pl.TimeResolved, str]
+        fig: go.Figure, df_and_color: tuple[pd.DataFrame, str]
     ) -> go.Figure:
-        tr, fillcolor = tr_and_color
-        return _add_FWHM_range(fig, tr, fillcolor)
+        df, fillcolor = df_and_color
+        return _add_FWHM_range(fig, df, fillcolor)
 
     return functools.reduce(
         _add_FWFM_range_wrapper,
-        zip(trs, itertools.cycle(px.colors.qualitative.Set1)),
+        zip(dfs, itertools.cycle(px.colors.qualitative.Set1)),
         fig,
     )

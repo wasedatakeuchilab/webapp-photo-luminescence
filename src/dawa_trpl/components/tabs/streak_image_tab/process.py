@@ -1,13 +1,16 @@
 import plotly.graph_objects as go
-import tlab_analysis.photo_luminescence as pl
+from tlab_analysis import trpl
 
 
-def create_figure(item_to_data: dict[str, pl.Data]) -> go.Figure:
+def create_figure(item_to_data: dict[str, trpl.TRPLData]) -> go.Figure:
     return (
         go.Figure(
             [
                 go.Surface(
-                    z=data.streak_image, x=data.wavelength, y=data.time, name=key
+                    z=data.to_streak_image(),
+                    x=data.wavelength.unique(),
+                    y=data.time.unique(),
+                    name=key,
                 )
                 for key, data in item_to_data.items()
             ]

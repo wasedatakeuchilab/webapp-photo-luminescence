@@ -4,11 +4,10 @@ import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import tlab_analysis.photo_luminescence as pl
 
 
-def create_figure(wrs: abc.Iterable[pl.WavelengthResolved], log_y: bool) -> go.Figure:
-    df = pd.concat([wr.df for wr in wrs])
+def create_figure(dfs: abc.Iterable[pd.DataFrame], log_y: bool) -> go.Figure:
+    df = pd.concat(dfs)
     range_y = np.array(
         [df["intensity"][np.isclose(df["time"], 0.0)].min(), df["intensity"].max()]
     )
@@ -41,21 +40,19 @@ def create_figure(wrs: abc.Iterable[pl.WavelengthResolved], log_y: bool) -> go.F
     return fig
 
 
-def add_fitting_curve(
-    fig: go.Figure, wrs: abc.Iterable[pl.WavelengthResolved]
-) -> go.Figure:
+def add_fitting_curve(fig: go.Figure, dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
     return fig.add_traces(
         [
             go.Scatter(
-                x=wr.df["time"],
-                y=wr.df["fit"],
+                x=df["time"],
+                y=df["fit"],
                 line=dict(color="black"),
                 name=f"Double Exponential Approximation "
-                f"a : b = {wr.df.attrs['fit']['a']}:{wr.df.attrs['fit']['b']}, "
-                f"τ₁ = {wr.df.attrs['fit']['tau1']:.3g} ns, "
-                f"τ₂ = {wr.df.attrs['fit']['tau2']:.3g} ns",
+                f"a : b = {df.attrs['fit']['a']}:{df.attrs['fit']['b']}, "
+                f"τ₁ = {df.attrs['fit']['tau1']:.3g} ns, "
+                f"τ₂ = {df.attrs['fit']['tau2']:.3g} ns",
             )
-            for wr in wrs
-            if "fit" in wr.df.attrs
+            for df in dfs
+            if "fit" in df.attrs
         ]
     )

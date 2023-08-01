@@ -10,6 +10,7 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objects as go
 import tlab_pptx
 from dash import dcc
+from tlab_analysis import utils
 
 from dawa_trpl import data_system as ds
 from dawa_trpl.components import upload_bar
@@ -67,30 +68,36 @@ def download_powerpoint(
     if len(filepaths) == 0:
         raise dash.exceptions.PreventUpdate  # TODO: Notify error to users
     filepath = filepaths[0]
-    data = ds.load_pldata(filepath)
-    frame_match = re.search("(?<=Frame=)[0-9]+(?=,)", data.metadata)
-    frame = int(frame_match.group(0)) if frame_match else 0
-    tr = ds.load_time_resolved(filepath)
-    wr = ds.load_wavelength_resolved(
-        filepath, tuple(wavelength_range[:2]), fitting=True
-    )
+    data = ds.load_trpl_data(filepath)
+    if match := re.search("(?<=Frame=)[0-9]+(?=,)", "".join(data.metadata)):
+        frame = int(match.group(0))
+    else:
+        frame = 0
+    wdf = ds.load_wavelength_df(filepath)
+    tdf = ds.load_time_df(filepath, tuple(wavelength_range[:2]), fitting=True)
     prs = tlab_pptx.presentation.photo_luminescence.build(
         title_text="title",
         excitation_wavelength=405,  # TODO: Retrieve from `item`
         excitation_power=5,  # TODO: Retrieve from `item`
         time_range=round(data.time.max() - data.time.min()),
-        center_wavelength=int(tr.peak_wavelength),
-        FWHM=tr.FWHM,
+        center_wavelength=utils.find_peak(
+            wdf["wavelength"].to_list(),
+            wdf["smoothed_intensity"].to_list(),
+        )[0],
+        FWHM=utils.find_FWHM(
+            wdf["wavelength"].to_list(),
+            wdf["smoothed_intensity"].to_list(),
+        ),
         frame=frame,
         date=datetime.date.fromisoformat(experiment_date)
         if experiment_date
         else datetime.date.today(),
         h_fig=go.Figure(h_fig),
         v_fig=go.Figure(v_fig),
-        a=int(wr.df.attrs["fit"]["a"]),
-        b=int(wr.df.attrs["fit"]["b"]),
-        tau1=float(wr.df.attrs["fit"]["tau1"]),
-        tau2=float(wr.df.attrs["fit"]["tau2"]),
+        a=int(tdf.attrs["fit"]["a"]),
+        b=int(tdf.attrs["fit"]["b"]),
+        tau1=float(tdf.attrs["fit"]["tau1"]),
+        tau2=float(tdf.attrs["fit"]["tau2"]),
     )
     with io.BytesIO() as f:
         prs.save(f)
