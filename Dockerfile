@@ -1,9 +1,9 @@
-FROM python:3.11-bullseye as builder
+FROM python:3.12-bullseye as builder
 WORKDIR /work
 COPY . /work
 RUN pip install --no-cache-dir . uvicorn==0.21.1
 
-FROM python:3.11-slim-bullseye as runner
+FROM python:3.12-slim-bullseye as runner
 LABEL org.opencontainers.image.title="DAWA for TRPL"
 LABEL org.opencontainers.image.description="A web application for TRPL measurements"
 LABEL org.opencontainers.image.licenses="MIT"
