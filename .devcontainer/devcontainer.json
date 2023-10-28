@@ -42,8 +42,9 @@
     "install the project": "pip install --user -e '.[test,stub]'",
     "install optional dependencies": "pip install --user -r .devcontainer/requirements.txt"
   },
-  "postStartCommand": {
-    "start dev server": "uvicorn dawa_trpl:server --reload --reload-dir=src"
-  },
-  "remoteUser": "vscode"
+  "postStartCommand": "uvicorn dawa_trpl:server --reload --reload-dir=src",
+  "remoteUser": "vscode",
+  "remoteEnv": {
+    "DAWA_TRPL_UPLOAD_BASEDIR": "/tmp/dawa_trpl"
+  }
 }
