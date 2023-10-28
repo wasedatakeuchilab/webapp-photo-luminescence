@@ -1,11 +1,10 @@
 import base64
 import os
-from collections import abc
-from unittest import mock
 
 import dash
 import plotly.graph_objects as go
 import pytest
+import pytest_mock
 
 from dawa_trpl.components.tabs import streak_image_tab
 
@@ -15,30 +14,13 @@ def selected_items() -> list[str]:
     return ["item.img"]
 
 
-@pytest.fixture()
-def process_mock() -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch("dawa_trpl.components.tabs.streak_image_tab.process") as m:
-        yield m
-
-
-@pytest.fixture()
-def ds_mock(
-    selected_items: list[str],
-    upload_dir: str,
-) -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch("dawa_trpl.components.tabs.streak_image_tab.ds") as m:
-        m.get_existing_item_filepaths.return_value = [
-            os.path.join(upload_dir, item) for item in selected_items
-        ]
-        yield m
-
-
 def test_update_streak_image_when_items_are_selected(
-    process_mock: mock.Mock,
-    ds_mock: mock.Mock,
     selected_items: list[str] | None,
     upload_dir: str,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    process_mock = mocker.patch("dawa_trpl.components.tabs.streak_image_tab.process")
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.streak_image_tab.ds")
     fig = streak_image_tab.update_streak_image(selected_items, upload_dir)
     assert fig == process_mock.create_figure.return_value
     ds_mock.validate_upload_dir.assert_called_once_with(upload_dir)
@@ -47,11 +29,11 @@ def test_update_streak_image_when_items_are_selected(
         ds_mock.validate_upload_dir.return_value,
     )
     filepaths = ds_mock.get_existing_item_filepaths.return_value
-    for call, filepath in zip(ds_mock.load_pldata.call_args_list, filepaths):
-        assert call == mock.call(filepath)
+    for call, filepath in zip(ds_mock.load_trpl_data.call_args_list, filepaths):
+        assert call == mocker.call(filepath)
     process_mock.create_figure.assert_called_once_with(
         {
-            os.path.basename(filepath): ds_mock.load_pldata.return_value
+            os.path.basename(filepath): ds_mock.load_trpl_data.return_value
             for filepath in filepaths
         }
     )
@@ -90,12 +72,16 @@ def test_update_download_button_ability_when_multiple_items_are_selected(
 
 
 def test_download_img(
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.streak_image_tab.ds")
+    ds_mock.get_existing_item_filepaths.return_value = [
+        os.path.join(upload_dir, item) for item in selected_items
+    ]
     raw_binary = b"raw_binary"
-    ds_mock.load_pldata.return_value.to_raw_binary.return_value = raw_binary
+    ds_mock.load_trpl_data.return_value.to_raw_binary.return_value = raw_binary
     assert streak_image_tab.download_img(2, selected_items, upload_dir) == dict(
         filename=selected_items[0],
         content=base64.urlsafe_b64encode(raw_binary).decode(),
@@ -107,7 +93,7 @@ def test_download_img(
         selected_items,
         ds_mock.validate_upload_dir.return_value,
     )
-    ds_mock.load_pldata.assert_called_once_with(
+    ds_mock.load_trpl_data.assert_called_once_with(
         ds_mock.get_existing_item_filepaths.return_value[0],
     )
 
@@ -126,11 +112,13 @@ def test_download_img_when_no_item_is_selected(
 
 
 def test_download_img_when_selected_item_does_not_exist(
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
-    ds_mock.get_existing_item_filepaths.return_value = list()
+    mocker.patch(
+        "dawa_trpl.data_system.get_existing_item_filepaths", return_value=list()
+    )
     with pytest.raises(dash.exceptions.PreventUpdate):
         streak_image_tab.download_img(
             1,
