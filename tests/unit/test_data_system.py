@@ -1,9 +1,10 @@
 import os
 import pathlib
-from unittest import mock
 
+import pandas as pd
 import pytest
-import tlab_analysis.photo_luminescence as pl
+import pytest_mock
+from tlab_analysis import trpl, utils
 
 from dawa_trpl import data_system as ds
 from tests import IMGDIR, FixtureRequest
@@ -82,22 +83,28 @@ def filepath(request: FixtureRequest[str]) -> str:
     return os.path.join(IMGDIR, request.param)
 
 
-def test_load_pldata(filepath: str) -> None:
-    assert ds.load_pldata(filepath) == pl.read_img(filepath)
+def test_load_trpl_data(filepath: str) -> None:
+    assert ds.load_trpl_data(filepath) == trpl.read_file(filepath)  # type: ignore[arg-type]
 
 
-def test_load_time_resolved(filepath: str) -> None:
-    tr = ds.load_time_resolved(filepath)
-    assert tr == pl.read_img(filepath).resolve_along_time()
-    assert all(tr.df["name"] == os.path.basename(filepath))
+def test_load_wavelength_df(filepath: str) -> None:
+    actual = ds.load_wavelength_df(filepath)
+    expected = ds.load_trpl_data(filepath).aggregate_along_time()
+    expected["smoothed_intensity"] = utils.smooth(expected["intensity"].to_list())
+    pd.testing.assert_series_equal(actual["wavelength"], expected["wavelength"])
+    pd.testing.assert_series_equal(actual["intensity"], expected["intensity"])
+    pd.testing.assert_series_equal(
+        actual["smoothed_intensity"], expected["smoothed_intensity"]
+    )
+    assert all(actual["name"] == os.path.basename(filepath))
 
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
-def test_load_time_resolved_with_normalize_intensity(
+def test_load_wavelength_df_with_normalize_intensity(
     filepath: str, normalize_intensity: bool
 ) -> None:
-    tr = ds.load_time_resolved(filepath, normalize_intensity)
-    assert bool(tr.df["intensity"].max() == 1.0) is normalize_intensity
+    wdf = ds.load_wavelength_df(filepath, normalize_intensity)
+    assert bool(wdf["intensity"].max() == 1.0) is normalize_intensity
 
 
 @pytest.fixture(params=["single_filepath", "multiple_filepaths"])
@@ -113,29 +120,35 @@ def filepaths(request: FixtureRequest[str]) -> list[str]:
 
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
-@mock.patch("dawa_trpl.data_system.load_time_resolved")
-def test_load_time_resolveds(
-    load_time_resolved_mock: mock.Mock,
+def test_load_wavelength_dfs(
     filepaths: list[str],
     normalize_intensity: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
-    trs = [mock.Mock(spec_set=pl.TimeResolved) for _ in filepaths]
-    load_time_resolved_mock.side_effect = trs
-    assert ds.load_time_resolveds(filepaths, normalize_intensity) == trs
+    load_wavelength_df_mock = mocker.patch("dawa_trpl.data_system.load_wavelength_df")
+    wdfs = [mocker.Mock() for _ in filepaths]
+    load_wavelength_df_mock.side_effect = wdfs
+    assert ds.load_wavelength_dfs(filepaths, normalize_intensity) == wdfs
     for call, filepath in zip(
-        load_time_resolved_mock.call_args_list, filepaths, strict=True
+        load_wavelength_df_mock.call_args_list, filepaths, strict=True
     ):
-        assert call == mock.call(filepath, normalize_intensity=normalize_intensity)
+        assert call == mocker.call(filepath, normalize_intensity=normalize_intensity)
 
 
 @pytest.mark.parametrize("wavelength_range", [(440, 470), (460, 500)])
-def test_load_wavelength_resolved(
+def test_load_time_df(
     filepath: str,
     wavelength_range: tuple[float, float],
 ) -> None:
-    wr = ds.load_wavelength_resolved(filepath, wavelength_range)
-    assert wr == ds.load_pldata(filepath).resolve_along_wavelength(wavelength_range)
-    assert all(wr.df["name"] == os.path.basename(filepath))
+    actual = ds.load_time_df(filepath, wavelength_range)
+    expected = ds.load_trpl_data(filepath).aggregate_along_wavelength(wavelength_range)
+    expected["smoothed_intensity"] = utils.smooth(expected["intensity"].to_list())
+    pd.testing.assert_series_equal(actual["time"], expected["time"])
+    pd.testing.assert_series_equal(actual["intensity"], expected["intensity"])
+    pd.testing.assert_series_equal(
+        actual["smoothed_intensity"], expected["smoothed_intensity"]
+    )
+    assert all(actual["name"] == os.path.basename(filepath))
     # TODO: Assert wr.df["fit"] is filled with nan
 
 
@@ -145,15 +158,15 @@ def wavelength_range() -> tuple[float, float]:
 
 
 @pytest.mark.parametrize("fitting", [True, False])
-def test_load_wavelength_resolved_with_fitting(
+def test_load_time_df_with_fitting(
     filepath: str,
     wavelength_range: tuple[float, float],
     fitting: bool,
 ) -> None:
-    wr = ds.load_wavelength_resolved(filepath, wavelength_range, fitting=fitting)
-    assert bool(wr.df.attrs.get("fit") is not None) is fitting
+    tdf = ds.load_time_df(filepath, wavelength_range, fitting=fitting)
+    assert bool(tdf.attrs.get("fit") is not None) is fitting
     if fitting:
-        assert set(wr.df.attrs["fit"].keys()) == {
+        assert set(tdf.attrs["fit"].keys()) == {
             "a",
             "tau1",
             "b",
@@ -165,42 +178,40 @@ def test_load_wavelength_resolved_with_fitting(
 
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
-def test_load_wavelength_resolved_with_normalize_intensity(
+def test_load_time_df_with_normalize_intensity(
     filepath: str,
     wavelength_range: tuple[float, float],
     normalize_intensity: bool,
 ) -> None:
-    wr = ds.load_wavelength_resolved(
+    tdf = ds.load_time_df(
         filepath, wavelength_range, normalize_intensity=normalize_intensity
     )
-    assert bool(wr.df["intensity"].max() == 1.0) is normalize_intensity
+    assert bool(tdf["intensity"].max() == 1.0) is normalize_intensity
 
 
 @pytest.mark.parametrize("fitting", [True, False])
 @pytest.mark.parametrize("normalize_intensity", [True, False])
-@mock.patch("dawa_trpl.data_system.load_wavelength_resolved")
-def test_load_wavelength_resolveds(
-    load_wavelength_resolved_mock: mock.Mock,
+def test_load_time_dfs(
     filepaths: list[str],
     wavelength_range: tuple[float, float],
     fitting: bool,
     normalize_intensity: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
-    wrs = [mock.Mock(spec_set=pl.WavelengthResolved) for _ in filepaths]
-    load_wavelength_resolved_mock.side_effect = wrs
+    tdfs = [mocker.Mock() for _ in filepaths]
+    load_time_df_mock = mocker.patch("dawa_trpl.data_system.load_time_df")
+    load_time_df_mock.side_effect = tdfs
     assert (
-        ds.load_wavelength_resolveds(
+        ds.load_time_dfs(
             filepaths,
             wavelength_range,
             fitting,
             normalize_intensity,
         )
-        == wrs
+        == tdfs
     )
-    for call, filepath in zip(
-        load_wavelength_resolved_mock.call_args_list, filepaths, strict=True
-    ):
-        assert call == mock.call(
+    for call, filepath in zip(load_time_df_mock.call_args_list, filepaths, strict=True):
+        assert call == mocker.call(
             filepath,
             wavelength_range=wavelength_range,
             fitting=fitting,

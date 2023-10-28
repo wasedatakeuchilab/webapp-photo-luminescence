@@ -44,7 +44,8 @@ def update_streak_image(
         ds.validate_upload_dir(upload_dir),
     )
     item_to_data = {
-        os.path.basename(filepath): ds.load_pldata(filepath) for filepath in filepaths
+        os.path.basename(filepath): ds.load_trpl_data(filepath)
+        for filepath in filepaths
     }
     fig = process.create_figure(item_to_data)
     return fig
@@ -81,7 +82,7 @@ def download_img(
     if len(filepaths) == 0:
         raise dash.exceptions.PreventUpdate  # TODO: Notify error to users
     filepath = filepaths[0]
-    data = ds.load_pldata(filepath)
+    data = ds.load_trpl_data(filepath)
     return dict(
         filename=os.path.basename(filepath),
         content=base64.urlsafe_b64encode(data.to_raw_binary()).decode(),

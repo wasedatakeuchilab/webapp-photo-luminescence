@@ -73,7 +73,7 @@ def update_graph(
         selected_items,
         ds.validate_upload_dir(upload_dir),
     )
-    wrs = ds.load_wavelength_resolveds(
+    dfs = ds.load_time_dfs(
         filepaths,
         (
             float(wavelength_range[0]),
@@ -82,9 +82,9 @@ def update_graph(
         fitting,
         normalize_intensity,
     )
-    fig = process.create_figure(wrs, log_y)
+    fig = process.create_figure(dfs, log_y)
     if fitting:
-        fig = process.add_fitting_curve(fig, wrs)
+        fig = process.add_fitting_curve(fig, dfs)
     return fig
 
 
@@ -110,7 +110,7 @@ def update_table(
         selected_items,
         ds.validate_upload_dir(upload_dir),
     )
-    wrs = ds.load_wavelength_resolveds(
+    dfs = ds.load_time_dfs(
         filepaths,
         (
             float(wavelength_range[0]),
@@ -119,7 +119,7 @@ def update_table(
         fitting,
         normalize_intensity,
     )
-    df = pd.concat([wr.df for wr in wrs])
+    df = pd.concat(dfs)
     return df.to_dict("records")
 
 
@@ -140,7 +140,7 @@ def update_wavelength_slider_range(
         ds.validate_upload_dir(upload_dir),
     )
     wavelength = np.concatenate(
-        [ds.load_pldata(filepath).wavelength for filepath in filepaths]
+        [ds.load_trpl_data(filepath).wavelength for filepath in filepaths]
     )
     return int(wavelength.min()), int(wavelength.max())
 
@@ -182,7 +182,7 @@ def download_csv(
     if len(filepaths) == 0:
         raise dash.exceptions.PreventUpdate  # TODO: Notify error to users
     filepath = filepaths[0]
-    wr = ds.load_wavelength_resolved(
+    df = ds.load_time_df(
         filepath, tuple(wavelength_range[:2]), fitting, normalize_intensity
     )
     filename = (
@@ -192,7 +192,7 @@ def download_csv(
     )
     return dict(
         filename=filename,
-        content=wr.df.to_csv(index=False),
+        content=df.to_csv(index=False),
         type="text/csv",
         base64=False,
     )

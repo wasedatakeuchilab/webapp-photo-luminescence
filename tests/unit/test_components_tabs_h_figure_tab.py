@@ -1,12 +1,11 @@
 import os
-from collections import abc
-from unittest import mock
 
 import dash
 import pandas as pd
 import plotly.graph_objects as go
 import pytest
-import tlab_analysis.photo_luminescence as pl
+import pytest_mock
+from tlab_analysis import trpl
 
 from dawa_trpl.components.tabs import h_figure_tab
 from tests import IMGDIR
@@ -17,41 +16,15 @@ def selected_items() -> list[str]:
     return ["item.img"]
 
 
-@pytest.fixture(scope="module")
-def trs() -> list[pl.TimeResolved]:
-    return [
-        pl.read_img(filepath).resolve_along_time() for filepath in IMGDIR.glob("*.img")
-    ]
-
-
-@pytest.fixture()
-def process_mock() -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch("dawa_trpl.components.tabs.h_figure_tab.process") as m:
-        yield m
-
-
-@pytest.fixture()
-def ds_mock(
-    trs: list[pl.TimeResolved],
-    selected_items: list[str],
-    upload_dir: str,
-) -> abc.Generator[mock.Mock, None, None]:
-    with mock.patch("dawa_trpl.components.tabs.h_figure_tab.ds") as m:
-        m.load_time_resolveds.return_value = trs
-        m.get_existing_item_filepaths.return_value = [
-            os.path.join(upload_dir, item) for item in selected_items
-        ]
-        yield m
-
-
 @pytest.mark.parametrize("normalize_intensity", [True, False])
 def test_update_graph_when_items_are_selected(
-    process_mock: mock.Mock,
-    ds_mock: mock.Mock,
     selected_items: list[str] | None,
     upload_dir: str,
     normalize_intensity: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    process_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.process")
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.ds")
     fig = h_figure_tab.update_graph(
         selected_items,
         upload_dir,
@@ -65,12 +38,12 @@ def test_update_graph_when_items_are_selected(
         selected_items,
         ds_mock.validate_upload_dir.return_value,
     )
-    ds_mock.load_time_resolveds.assert_called_once_with(
+    ds_mock.load_wavelength_dfs.assert_called_once_with(
         ds_mock.get_existing_item_filepaths.return_value,
         normalize_intensity,
     )
     process_mock.create_figure.assert_called_once_with(
-        ds_mock.load_time_resolveds.return_value
+        ds_mock.load_wavelength_dfs.return_value
     )
 
 
@@ -91,12 +64,13 @@ def test_update_graph_when_selected_items_is_empty_or_None(
 
 @pytest.mark.parametrize("show_peak_vline", [True, False])
 def test_update_graph_with_show_peak_vline(
-    process_mock: mock.Mock,
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
     show_peak_vline: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    process_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.process")
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.ds")
     fig = h_figure_tab.update_graph(
         selected_items,
         upload_dir,
@@ -108,7 +82,7 @@ def test_update_graph_with_show_peak_vline(
         assert fig == process_mock.add_peak_vline.return_value
         process_mock.add_peak_vline.assert_called_once_with(
             process_mock.create_figure.return_value,
-            ds_mock.load_time_resolveds.return_value,
+            ds_mock.load_wavelength_dfs.return_value,
         )
     else:
         assert fig == process_mock.create_figure.return_value
@@ -117,12 +91,13 @@ def test_update_graph_with_show_peak_vline(
 
 @pytest.mark.parametrize("show_FWHM_range", [True, False])
 def test_update_graph_with_show_FWHM_range(
-    process_mock: mock.Mock,
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
     show_FWHM_range: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    process_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.process")
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.ds")
     fig = h_figure_tab.update_graph(
         selected_items,
         upload_dir,
@@ -134,7 +109,7 @@ def test_update_graph_with_show_FWHM_range(
         assert fig == process_mock.add_FWHM_range.return_value
         process_mock.add_FWHM_range.assert_called_once_with(
             process_mock.create_figure.return_value,
-            ds_mock.load_time_resolveds.return_value,
+            ds_mock.load_wavelength_dfs.return_value,
         )
     else:
         assert fig == process_mock.create_figure.return_value
@@ -143,25 +118,30 @@ def test_update_graph_with_show_FWHM_range(
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
 def test_update_table_when_items_are_selected(
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
     normalize_intensity: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.ds")
+    ds_mock.load_wavelength_dfs.return_value = [
+        trpl.read_file(filepath).aggregate_along_time()
+        for filepath in IMGDIR.glob("*.img")
+    ]
     table = h_figure_tab.update_table(
         selected_items,
         upload_dir,
         normalize_intensity,
     )
-    assert table == pd.concat(
-        [tr.df for tr in ds_mock.load_time_resolveds.return_value]
-    ).to_dict("records")
+    assert table == pd.concat(ds_mock.load_wavelength_dfs.return_value).to_dict(
+        "records"
+    )
     ds_mock.validate_upload_dir.assert_called_once_with(upload_dir)
     ds_mock.get_existing_item_filepaths.assert_called_once_with(
         selected_items,
         ds_mock.validate_upload_dir.return_value,
     )
-    ds_mock.load_time_resolveds.assert_called_once_with(
+    ds_mock.load_wavelength_dfs.assert_called_once_with(
         ds_mock.get_existing_item_filepaths.return_value,
         normalize_intensity,
     )
@@ -204,16 +184,20 @@ def test_update_download_button_ability_when_multiple_items_are_selected(
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
 def test_download_csv(
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
     normalize_intensity: bool,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
+    ds_mock = mocker.patch("dawa_trpl.components.tabs.h_figure_tab.ds")
+    ds_mock.get_existing_item_filepaths.return_value = [
+        os.path.join(upload_dir, item) for item in selected_items
+    ]
     assert h_figure_tab.download_csv(
         1, selected_items, upload_dir, normalize_intensity
     ) == dict(
         filename="h-" + selected_items[0] + ".csv",
-        content=ds_mock.load_time_resolved.return_value.df.to_csv.return_value,
+        content=ds_mock.load_wavelength_df.return_value.to_csv.return_value,
         type="text/csv",
         base64=False,
     )
@@ -222,7 +206,7 @@ def test_download_csv(
         selected_items,
         ds_mock.validate_upload_dir.return_value,
     )
-    ds_mock.load_time_resolved.assert_called_once_with(
+    ds_mock.load_wavelength_df.assert_called_once_with(
         ds_mock.get_existing_item_filepaths.return_value[0],
         normalize_intensity,
     )
@@ -240,11 +224,13 @@ def test_download_csv_when_no_item_is_selected(
 
 
 def test_download_csv_when_selected_item_does_not_exist(
-    ds_mock: mock.Mock,
     selected_items: list[str],
     upload_dir: str,
+    mocker: pytest_mock.MockerFixture,
 ) -> None:
-    ds_mock.get_existing_item_filepaths.return_value = list()
+    mocker.patch(
+        "dawa_trpl.data_system.get_existing_item_filepaths", return_value=list()
+    )
     with pytest.raises(dash.exceptions.PreventUpdate):
         h_figure_tab.download_csv(
             1, selected_items, upload_dir, normalize_intensity=False

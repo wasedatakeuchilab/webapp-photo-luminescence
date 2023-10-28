@@ -1,17 +1,17 @@
 import tempfile
 from collections import abc
-from unittest import mock
 
 import pytest
+import pytest_mock
 
 from tests import FixtureRequest
 
 
-@pytest.fixture(scope="module", autouse=True)
-def upload_basedir() -> abc.Generator[str, None, None]:
+@pytest.fixture(autouse=True)
+def upload_basedir(mocker: pytest_mock.MockerFixture) -> abc.Generator[str, None, None]:
     with tempfile.TemporaryDirectory() as tmpdir:
-        with mock.patch("dawa_trpl.config.UPLOAD_BASEDIR", tmpdir):
-            yield tmpdir
+        mocker.patch("dawa_trpl.config.UPLOAD_BASEDIR", new=tmpdir)
+        yield tmpdir
 
 
 @pytest.fixture()

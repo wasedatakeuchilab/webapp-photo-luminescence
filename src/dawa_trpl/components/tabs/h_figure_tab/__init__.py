@@ -61,12 +61,12 @@ def update_graph(
         selected_items,
         ds.validate_upload_dir(upload_dir),
     )
-    trs = ds.load_time_resolveds(filepaths, normalize_intensity)
-    fig = process.create_figure(trs)
+    dfs = ds.load_wavelength_dfs(filepaths, normalize_intensity)
+    fig = process.create_figure(dfs)
     if show_peak_vline:
-        fig = process.add_peak_vline(fig, trs)
+        fig = process.add_peak_vline(fig, dfs)
     if show_FWHM_range:
-        fig = process.add_FWHM_range(fig, trs)
+        fig = process.add_FWHM_range(fig, dfs)
     return fig
 
 
@@ -86,8 +86,8 @@ def update_table(
         selected_items,
         ds.validate_upload_dir(upload_dir),
     )
-    trs = ds.load_time_resolveds(filepaths, normalize_intensity)
-    df = pd.concat([tr.df for tr in trs])
+    dfs = ds.load_wavelength_dfs(filepaths, normalize_intensity)
+    df = pd.concat(dfs)
     return df.to_dict("records")
 
 
@@ -124,10 +124,10 @@ def download_csv(
     if len(filepaths) == 0:
         raise dash.exceptions.PreventUpdate  # TODO: Notify error to users
     filepath = filepaths[0]
-    tr = ds.load_time_resolved(filepath, normalize_intensity)
+    df = ds.load_wavelength_df(filepath, normalize_intensity)
     return dict(
         filename="h-" + os.path.basename(filepath) + ".csv",
-        content=tr.df.to_csv(index=False),
+        content=df.to_csv(index=False),
         type="text/csv",
         base64=False,
     )
