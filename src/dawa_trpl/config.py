@@ -1,5 +1,8 @@
 import os
 import tempfile
 
-URL_BASE_PATH = os.environ.get("URL_BASE_PATH", "/")
-UPLOAD_BASEDIR = os.environ.get("UPLOAD_BASEDIR", tempfile.mkdtemp(prefix="wpl"))
+_PREFIX = "DAWA_TRPL_"
+URL_BASE_PATH = os.environ.get(_PREFIX + "URL_BASE_PATH", "/")
+UPLOAD_BASEDIR = os.environ.get(
+    _PREFIX + "UPLOAD_BASEDIR", tempfile.mkdtemp(prefix="dawa_trpl_")
+)
