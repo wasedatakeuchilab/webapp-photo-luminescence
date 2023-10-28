@@ -69,7 +69,11 @@ def download_powerpoint(
         raise dash.exceptions.PreventUpdate  # TODO: Notify error to users
     filepath = filepaths[0]
     data = ds.load_trpl_data(filepath)
-    frame = int(match[0]) if (match := re.search("(?<=Frame=)[0-9]+(?=,)", "".join(data.metadata))) else 0
+    frame = (
+        int(match[0])
+        if (match := re.search("(?<=Frame=)[0-9]+(?=,)", "".join(data.metadata)))
+        else 0
+    )
     wdf = ds.load_wavelength_df(filepath)
     tdf = ds.load_time_df(filepath, tuple(wavelength_range[:2]), fitting=True)
     prs = tlab_pptx.presentation.photo_luminescence.build(
