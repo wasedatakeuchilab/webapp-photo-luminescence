@@ -4,7 +4,9 @@ import typing as t
 from collections import abc
 
 import numpy as np
-import tlab_analysis.photo_luminescence as pl
+import pandas as pd
+from scipy import optimize
+from tlab_analysis import trpl, utils
 
 from dawa_trpl import config
 
@@ -40,50 +42,55 @@ def get_existing_item_filepaths(
 
 
 @functools.lru_cache(maxsize=32)
-def load_pldata(filepath: str) -> pl.Data:
-    return pl.read_img(filepath)
+def load_trpl_data(filepath: str) -> trpl.TRPLData:
+    return trpl.read_file(filepath)  # type: ignore[arg-type]
 
 
 @functools.lru_cache(maxsize=32)
-def load_time_resolved(
+def load_wavelength_df(
     filepath: str, normalize_intensity: bool = False
-) -> pl.TimeResolved:
-    data = load_pldata(filepath)
-    tr = data.resolve_along_time()
+) -> pd.DataFrame:
+    data = load_trpl_data(filepath)
+    df = data.aggregate_along_time()
+    df["smoothed_intensity"] = utils.smooth(df["intensity"].to_list())
+    df["name"] = os.path.basename(filepath)
     if normalize_intensity:
-        tr.df["intensity"] /= tr.df["intensity"].max()
-    tr.df["name"] = os.path.basename(filepath)
-    return tr
+        max_intensity = df["intensity"].max()
+        df["intensity"] /= max_intensity
+        df["smoothed_intensity"] /= max_intensity
+    return df
 
 
-def load_time_resolveds(
+def load_wavelength_dfs(
     filepaths: abc.Iterable[str],
     normalize_intensity: bool = False,
-) -> list[pl.TimeResolved]:
+) -> list[pd.DataFrame]:
     load = functools.partial(
-        load_time_resolved, normalize_intensity=normalize_intensity
+        load_wavelength_df, normalize_intensity=normalize_intensity
     )
     return list(map(load, filepaths))
 
 
 @functools.lru_cache(maxsize=32)
-def load_wavelength_resolved(
+def load_time_df(
     filepath: str,
     wavelength_range: tuple[float, float] | None = None,
     fitting: bool = False,
     normalize_intensity: bool = False,
-) -> pl.WavelengthResolved:
-    data = load_pldata(filepath)
-    wr = data.resolve_along_wavelength(wavelength_range)
-    wr.df["fit"] = np.nan
-    wr.df["name"] = os.path.basename(filepath)
+) -> pd.DataFrame:
+    data = load_trpl_data(filepath)
+    df = data.aggregate_along_wavelength(wavelength_range)
+    df["smoothed_intensity"] = utils.smooth(df["intensity"].to_list())
+    df["fit"] = np.nan
+    df["name"] = os.path.basename(filepath)
     if fitting:
-        _fit_to_wavelength_resolved(wr)
+        _fit_to_time_df(df)
     if normalize_intensity:
-        max_intensity = wr.df["intensity"].max()
-        wr.df["intensity"] /= max_intensity
-        wr.df["fit"] /= max_intensity
-    return wr
+        max_intensity = df["intensity"].max()
+        df["intensity"] /= max_intensity
+        df["smoothed_intensity"] /= max_intensity
+        df["fit"] /= max_intensity
+    return df
 
 
 def _double_exponential(
@@ -92,13 +99,24 @@ def _double_exponential(
     return a * np.exp(-time / tau1) + b * np.exp(-time / tau2)
 
 
-def _fit_to_wavelength_resolved(wr: pl.WavelengthResolved) -> pl.WavelengthResolved:
-    max_intensity = wr.df["intensity"].max()
-    wr.df["intensity"] /= max_intensity
-    params, cov = wr.fit(_double_exponential, bounds=(0.0, np.inf))  # type: ignore
+def _fit_to_time_df(df: pd.DataFrame) -> pd.DataFrame:
+    max_intensity = df["intensity"].max()
+    fit = df["time"].between(
+        *utils.determine_fit_range_dc(
+            df["time"].to_list(),
+            df["intensity"].to_list(),
+        ),
+    )
+    params, cov = optimize.curve_fit(
+        _double_exponential,
+        xdata=df["time"][fit],
+        ydata=df["intensity"][fit] / max_intensity,
+        bounds=(0.0, np.inf),
+        maxfev=10000,
+    )
     fast, slow = sorted((params[:2], params[2:]), key=lambda x: x[1])
     a = int(fast[0] / (fast[0] + slow[0]) * 100)
-    wr.df.attrs["fit"] = {
+    df.attrs["fit"] = {
         "a": a,
         "tau1": fast[1],
         "b": 100 - a,
@@ -106,19 +124,18 @@ def _fit_to_wavelength_resolved(wr: pl.WavelengthResolved) -> pl.WavelengthResol
         "params": params,
         "cov": cov,
     }
-    wr.df["intensity"] *= max_intensity
-    wr.df["fit"] *= max_intensity
-    return wr
+    df["fit"] = _double_exponential(df["time"][fit], *params) * max_intensity  # type: ignore[arg-type]
+    return df
 
 
-def load_wavelength_resolveds(
+def load_time_dfs(
     filepaths: abc.Iterable[str],
     wavelength_range: tuple[float, float] | None = None,
     fitting: bool = False,
     normalize_intensity: bool = False,
-) -> list[pl.WavelengthResolved]:
+) -> list[pd.DataFrame]:
     load = functools.partial(
-        load_wavelength_resolved,
+        load_time_df,
         wavelength_range=wavelength_range,
         fitting=fitting,
         normalize_intensity=normalize_intensity,
