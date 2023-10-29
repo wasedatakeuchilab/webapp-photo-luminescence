@@ -53,7 +53,7 @@ def load_wavelength_df(
     data = load_trpl_data(filepath)
     df = data.aggregate_along_time()
     df["smoothed_intensity"] = utils.smooth(df["intensity"].to_list())
-    df["name"] = os.path.basename(filepath)
+    df.attrs["filename"] = os.path.basename(filepath)
     if normalize_intensity:
         max_intensity = df["intensity"].max()
         df["intensity"] /= max_intensity
@@ -82,9 +82,33 @@ def load_time_df(
     df = data.aggregate_along_wavelength(wavelength_range)
     df["smoothed_intensity"] = utils.smooth(df["intensity"].to_list())
     df["fit"] = np.nan
-    df["name"] = os.path.basename(filepath)
+    df.attrs["filename"] = os.path.basename(filepath)
     if fitting:
-        _fit_to_time_df(df)
+        max_intensity = df["intensity"].max()
+        fit = df["time"].between(
+            *utils.determine_fit_range_dc(
+                df["time"].to_list(),
+                df["smoothed_intensity"].to_list(),
+            ),
+        )
+        params, cov = optimize.curve_fit(
+            _double_exponential,
+            xdata=df["time"][fit],
+            ydata=df["smoothed_intensity"][fit] / max_intensity,
+            bounds=(0.0, np.inf),
+            maxfev=10000,
+        )
+        fast, slow = sorted((params[:2], params[2:]), key=lambda x: 1 / x[1])
+        a = int(fast[0] / (fast[0] + slow[0]) * 100)
+        df.attrs["fit"] = {
+            "a": a,
+            "tau1": fast[1],
+            "b": 100 - a,
+            "tau2": slow[1],
+            "params": params,
+            "cov": cov,
+        }
+        df["fit"] = _double_exponential(df["time"][fit], *params) * max_intensity  # type: ignore[arg-type]
     if normalize_intensity:
         max_intensity = df["intensity"].max()
         df["intensity"] /= max_intensity
@@ -97,35 +121,6 @@ def _double_exponential(
     time: float, a: float, tau1: float, b: float, tau2: float
 ) -> t.Any:
     return a * np.exp(-time / tau1) + b * np.exp(-time / tau2)
-
-
-def _fit_to_time_df(df: pd.DataFrame) -> pd.DataFrame:
-    max_intensity = df["intensity"].max()
-    fit = df["time"].between(
-        *utils.determine_fit_range_dc(
-            df["time"].to_list(),
-            df["intensity"].to_list(),
-        ),
-    )
-    params, cov = optimize.curve_fit(
-        _double_exponential,
-        xdata=df["time"][fit],
-        ydata=df["intensity"][fit] / max_intensity,
-        bounds=(0.0, np.inf),
-        maxfev=10000,
-    )
-    fast, slow = sorted((params[:2], params[2:]), key=lambda x: x[1])
-    a = int(fast[0] / (fast[0] + slow[0]) * 100)
-    df.attrs["fit"] = {
-        "a": a,
-        "tau1": fast[1],
-        "b": 100 - a,
-        "tau2": slow[1],
-        "params": params,
-        "cov": cov,
-    }
-    df["fit"] = _double_exponential(df["time"][fit], *params) * max_intensity  # type: ignore[arg-type]
-    return df
 
 
 def load_time_dfs(
