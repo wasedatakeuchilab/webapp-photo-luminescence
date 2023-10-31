@@ -9,6 +9,7 @@ from tlab_analysis import utils
 
 
 def create_figure(dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
+    dfs = [df.assign(name=df.attrs["filename"]) for df in dfs]
     df = pd.concat(dfs)
     fig = (
         px.line(

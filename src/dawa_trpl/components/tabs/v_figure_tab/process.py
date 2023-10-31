@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 
 
 def create_figure(dfs: abc.Iterable[pd.DataFrame], log_y: bool) -> go.Figure:
+    dfs = [df.assign(name=df.attrs["filename"]) for df in dfs]
     df = pd.concat(dfs)
     range_y = np.array(
         [df["intensity"][np.isclose(df["time"], 0.0)].min(), df["intensity"].max()]
