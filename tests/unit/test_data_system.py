@@ -96,7 +96,7 @@ def test_load_wavelength_df(filepath: str) -> None:
     pd.testing.assert_series_equal(
         actual["smoothed_intensity"], expected["smoothed_intensity"]
     )
-    assert all(actual["name"] == os.path.basename(filepath))
+    assert actual.attrs["filename"] == os.path.basename(filepath)
 
 
 @pytest.mark.parametrize("normalize_intensity", [True, False])
@@ -148,7 +148,7 @@ def test_load_time_df(
     pd.testing.assert_series_equal(
         actual["smoothed_intensity"], expected["smoothed_intensity"]
     )
-    assert all(actual["name"] == os.path.basename(filepath))
+    assert actual.attrs["filename"] == os.path.basename(filepath)
     # TODO: Assert wr.df["fit"] is filled with nan
 
 
