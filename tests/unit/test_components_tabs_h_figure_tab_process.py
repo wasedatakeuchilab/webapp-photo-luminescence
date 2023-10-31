@@ -3,8 +3,8 @@ import pathlib
 import pandas as pd
 import plotly.graph_objects as go
 import pytest
-from tlab_analysis import trpl
 
+from dawa_trpl import data_system as ds
 from dawa_trpl.components.tabs.h_figure_tab import process
 from tests import IMGDIR
 
@@ -12,10 +12,8 @@ from tests import IMGDIR
 @pytest.fixture(scope="module")
 def dfs() -> list[pd.DataFrame]:
     def load_wavelength_df(filepath: pathlib.Path) -> pd.DataFrame:
-        wdf = trpl.read_file(filepath).aggregate_along_time()
-        wdf["smoothed_intensity"] = wdf["intensity"]
-        wdf["name"] = filepath.name
-        return wdf
+        df = ds.load_wavelength_df(filepath.as_posix())
+        return df
 
     return list(map(load_wavelength_df, IMGDIR.glob("*.img")))
 
