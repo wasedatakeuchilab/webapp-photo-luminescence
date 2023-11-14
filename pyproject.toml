@@ -14,12 +14,11 @@ authors = [
 # keywords = []
 # classifiers = []
 dependencies = [
-  "dash~=2.14.0",
+  "dash~=2.14.1",
   "dash-bootstrap-components~=1.5.0",
-  "pandas~=2.1.1",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.3.1",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.4",
-  "asgiref~=3.7.1",
+  "asgiref~=3.7.2",
 ]
 dynamic = ["version"]
 
@@ -28,34 +27,53 @@ Documentation = ""
 Homepage = "https://github.com/wasedatakeuchilab/dawa-trpl"
 
 [project.optional-dependencies]
-test = [
-  "pytest==7.4.3",
-  "pytest-cov==4.1.0",
-  "pytest-describe==2.1.0",
-  "pytest-mock==3.12.0",
-  "mypy==1.6.1",
-  "flake8==6.1.0",
-  "isort==5.12.0",
-  "black==23.10.1",
+uvicorn = [
+  "uvicorn==0.24.0",
 ]
-stub = [
-  "pandas-stubs~=2.1.1",
-]
-doc = []
 
 [tool.hatch.version]
 path = "src/dawa_trpl/__init__.py"
 
-[tool.hatch.envs.test]
-features = ["test", "stub"]
+[tool.hatch.envs.default]
+dependencies = [
+  "pytest==7.4.3",
+  "pytest-cov==4.1.0",
+  "pytest-describe==2.1.0",
+  "pytest-mock==3.12.0",
+  "mypy==1.7.0",
+  "pandas-stubs==2.1.1.230928",
+  "ipywidgets==8.1.1",
+  "jupyterlab==4.0.8",
+]
+features = ["uvicorn"]
 
-[tool.hatch.envs.test.scripts]
-test = "scripts/test.sh {args}"
-format = "scripts/format.sh {args}"
-lint = "scripts/lint.sh {args}"
+[tool.hatch.envs.default.scripts]
+test = "pytest --cov-report=term-missing:skip-covered src tests"
+# test-doc = "pytest --doctest-modules src"
+check-type = "mypy src tests"
+serve = "uvicorn dawa_trpl:server --reload --reload-dir=src"
+
+[tool.hatch.envs.lint]
+skip-install = true
+dependencies = [
+  "flake8==6.1.0",
+  "isort==5.12.0",
+  "black==23.11.0",
+]
+
+[tool.hatch.envs.lint.scripts]
+format = [
+  "isort src tests scripts",
+  "black src tests scripts",
+]
+lint = [
+  "isort --check-only src tests",
+  "black --check src tests",
+  "flake8 src tests",
+]
 
 [tool.hatch.envs.doc]
-features = ["doc"]
+dependencies = []
 
 [tool.hatch.envs.doc.scripts]
 

@@ -1,10 +1,8 @@
 {
   "name": "Python 3",
   "image": "mcr.microsoft.com/vscode/devcontainers/python:3.12",
-  "mounts": [],
-  "runArgs": [],
   "features": {
-    "ghcr.io/rocker-org/devcontainer-features/apt-packages:1": {
+    "ghcr.io/devcontainers-contrib/features/apt-packages:1": {
       "packages": "bash-completion"
     },
     "ghcr.io/devcontainers-contrib/features/pre-commit:2": {},
@@ -13,17 +11,18 @@
   },
   "customizations": {
     "vscode": {
-      "settings": {},
       "extensions": [
         "esbenp.prettier-vscode",
         "github.vscode-github-actions",
-        "ninoseki.vscode-pylens",
+        "GitHub.vscode-pull-request-github",
         "ms-azuretools.vscode-docker",
         "ms-python.black-formatter",
         "ms-python.flake8",
         "ms-python.isort",
         "ms-python.python",
         "ms-python.vscode-pylance",
+        "ms-toolsai.jupyter",
+        "ninoseki.vscode-pylens",
         "redhat.vscode-yaml",
         "tamasfe.even-better-toml",
         "timonwong.shellcheck",
@@ -31,17 +30,11 @@
       ]
     }
   },
-  "onCreateCommand": {
-    "upgrade pip": "pip install -U pip"
-  },
   "postCreateCommand": {
     "install pre-commit": "pre-commit install",
     "install pip-completion": "echo 'source <(pip completion --bash)' >> ~/.bashrc",
-    "install the project": "pip install --user -e '.[test,stub]'",
-    "install optional dependencies": "pip install --user -r .devcontainer/requirements.txt"
+    "create hatch env": "bash .devcontainer/create-hatch-env.sh"
   },
-  "postStartCommand": "uvicorn dawa_trpl:server --reload --reload-dir=src",
-  "remoteUser": "vscode",
   "remoteEnv": {
     "DAWA_TRPL_UPLOAD_BASEDIR": "/tmp/dawa_trpl"
   }
