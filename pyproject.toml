@@ -48,10 +48,10 @@ dependencies = [
 features = ["uvicorn"]
 
 [tool.hatch.envs.default.scripts]
-test = "pytest --cov-report=term-missing:skip-covered src tests"
+test = "pytest --cov-report=term-missing:skip-covered src tests {args}"
 # test-doc = "pytest --doctest-modules src"
-check-type = "mypy src tests"
-serve = "uvicorn dawa_trpl:server --reload --reload-dir=src"
+check-type = "mypy src tests {args}"
+serve = "uvicorn dawa_trpl:server --reload --reload-dir=src {args}"
 
 [tool.hatch.envs.lint]
 skip-install = true
