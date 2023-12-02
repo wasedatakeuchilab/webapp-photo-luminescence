@@ -24,9 +24,6 @@ download_button = dbc.Button(
     color="primary",
     className="mt-2",
 )
-datepicker = dcc.DatePickerSingle(
-    id="experiment-date-picker-single", with_portal=True, persistence_type="session"
-)
 
 
 @dash.callback(
@@ -47,7 +44,6 @@ def update_download_button_ability(selected_items: list[str] | None) -> bool:
     dash.State(v_figure_tab.wavelength_slider, "value"),
     dash.State(h_figure_tab.graph, "figure"),
     dash.State(v_figure_tab.graph, "figure"),
-    dash.State(datepicker, "date"),
     prevent_initial_call=True,
 )
 def download_powerpoint(
@@ -57,7 +53,6 @@ def download_powerpoint(
     wavelength_range: list[int],
     h_fig: dict[str, t.Any] | None,
     v_fig: dict[str, t.Any] | None,
-    experiment_date: str | None,
 ) -> dict[str, t.Any]:
     if not selected_items:
         raise dash.exceptions.PreventUpdate  # TODO: Notify error to users
@@ -71,28 +66,37 @@ def download_powerpoint(
     data = ds.load_trpl_data(filepath)
     frame = (
         int(match[0])
-        if (match := re.search("(?<=Frame=)[0-9]+(?=,)", "".join(data.metadata)))
+        if (match := re.search(r"(?<=Frame=)[0-9]+(?=,)", data.metadata[0]))
         else 0
     )
+    center_wavelength = (
+        float(match[0])
+        if (
+            match := re.search(r"(?<=Wavelength=)[0-9\.]+(?=\[nm\],)", data.metadata[2])
+        )
+        else 0
+    )
+    date = (
+        datetime.date.fromisoformat(match[0].replace("/", "-"))
+        if (match := re.search(r"(?<=Date:)[0-9/]+(?=,)", data.metadata[3]))
+        else datetime.date.today()
+    )
     wdf = ds.load_wavelength_df(filepath)
+    peaks = utils.find_peaks(
+        wdf["wavelength"].to_list(),
+        wdf["intensity"].to_list(),
+    )
+    peaks.sort(key=lambda peak: peak.y)
     tdf = ds.load_time_df(filepath, tuple(wavelength_range[:2]), fitting=True)
     prs = tlab_pptx.presentation.photo_luminescence.build(
         title_text="title",
         excitation_wavelength=405,  # TODO: Retrieve from `item`
         excitation_power=5,  # TODO: Retrieve from `item`
         time_range=round(data.time.max() - data.time.min()),
-        center_wavelength=utils.find_peak(
-            wdf["wavelength"].to_list(),
-            wdf["smoothed_intensity"].to_list(),
-        )[0],
-        FWHM=utils.find_FWHM(
-            wdf["wavelength"].to_list(),
-            wdf["smoothed_intensity"].to_list(),
-        ),
+        center_wavelength=int(center_wavelength),
+        FWHM=peaks[0].width,
         frame=frame,
-        date=datetime.date.fromisoformat(experiment_date)
-        if experiment_date
-        else datetime.date.today(),
+        date=date,
         h_fig=go.Figure(h_fig),
         v_fig=go.Figure(v_fig),
         a=int(tdf.attrs["fit"]["a"]),
