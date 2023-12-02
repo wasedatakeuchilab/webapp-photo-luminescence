@@ -39,7 +39,7 @@ mypy = [
 ]
 jupyter = [
   "ipywidgets==8.1.1",
-  "jupyterlab==4.0.8",
+  "jupyterlab==4.0.9",
 ]
 uvicorn = [
   "uvicorn==0.24.0",
