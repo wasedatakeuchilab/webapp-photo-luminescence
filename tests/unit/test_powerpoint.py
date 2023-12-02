@@ -60,7 +60,6 @@ def test_download_powerpoint_when_items_are_selected(
         wavelength_range=wavelength_range,
         h_fig=None,
         v_fig=None,
-        experiment_date=None,
     )
     assert (
         result["filename"] == pathlib.Path(selected_items[0]).with_suffix(".pptx").name
@@ -88,7 +87,6 @@ def test_download_powerpoint_when_no_item_is_selected(
             wavelength_range=[400, 500],
             h_fig=None,
             v_fig=None,
-            experiment_date=None,
         )
 
 
@@ -105,5 +103,4 @@ def test_download_powerpoint_when_selected_item_does_not_exist(
             wavelength_range=[400, 500],
             h_fig=None,
             v_fig=None,
-            experiment_date=None,
         )
