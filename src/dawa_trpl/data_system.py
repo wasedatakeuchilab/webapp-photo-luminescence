@@ -5,7 +5,6 @@ from collections import abc
 
 import numpy as np
 import pandas as pd
-from scipy import optimize
 from tlab_analysis import trpl, utils
 
 from dawa_trpl import config
@@ -43,7 +42,7 @@ def get_existing_item_filepaths(
 
 @functools.lru_cache(maxsize=32)
 def load_trpl_data(filepath: str) -> trpl.TRPLData:
-    return trpl.read_file(filepath)  # type: ignore[arg-type]
+    return trpl.read_file(filepath)
 
 
 @functools.lru_cache(maxsize=32)
@@ -52,12 +51,10 @@ def load_wavelength_df(
 ) -> pd.DataFrame:
     data = load_trpl_data(filepath)
     df = data.aggregate_along_time()
-    df["smoothed_intensity"] = utils.smooth(df["intensity"].to_list())
     df.attrs["filename"] = os.path.basename(filepath)
     if normalize_intensity:
         max_intensity = df["intensity"].max()
         df["intensity"] /= max_intensity
-        df["smoothed_intensity"] /= max_intensity
     return df
 
 
@@ -80,7 +77,6 @@ def load_time_df(
 ) -> pd.DataFrame:
     data = load_trpl_data(filepath)
     df = data.aggregate_along_wavelength(wavelength_range)
-    df["smoothed_intensity"] = utils.smooth(df["intensity"].to_list())
     df["fit"] = np.nan
     df.attrs["filename"] = os.path.basename(filepath)
     if fitting:
@@ -88,15 +84,14 @@ def load_time_df(
         fit = df["time"].between(
             *utils.determine_fit_range_dc(
                 df["time"].to_list(),
-                df["smoothed_intensity"].to_list(),
+                df["intensity"].to_list(),
             ),
         )
-        params, cov = optimize.curve_fit(
+        params, cov = utils.curve_fit(
             _double_exponential,
-            xdata=df["time"][fit],
-            ydata=df["smoothed_intensity"][fit] / max_intensity,
+            xdata=df["time"][fit].to_list(),
+            ydata=df["intensity"][fit].to_list() / max_intensity,
             bounds=(0.0, np.inf),
-            maxfev=10000,
         )
         fast, slow = sorted((params[:2], params[2:]), key=lambda x: 1 / x[1])
         a = int(fast[0] / (fast[0] + slow[0]) * 100)
@@ -112,7 +107,6 @@ def load_time_df(
     if normalize_intensity:
         max_intensity = df["intensity"].max()
         df["intensity"] /= max_intensity
-        df["smoothed_intensity"] /= max_intensity
         df["fit"] /= max_intensity
     return df
 
