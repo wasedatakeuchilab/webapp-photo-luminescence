@@ -39,49 +39,59 @@ def create_figure(dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
 
 def add_peak_vline(fig: go.Figure, dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
     def _add_peak_vline(fig: go.Figure, df: pd.DataFrame) -> go.Figure:
-        peak = utils.find_peak(
+        peaks = utils.find_peaks(
             df["wavelength"].to_list(),
-            df["smoothed_intensity"].to_list(),
+            df["intensity"].to_list(),
         )
-        return fig.add_vline(
-            peak[0],
-            annotation=dict(
-                text=f"Wavelength: {peak[0]:.2f} nm",
-                hovertext=f"Intensity: {peak[1]:.4g}",
-            ),
-        )
+        for peak in peaks:
+            fig.add_vline(
+                peak.x,
+                annotation=dict(
+                    text=f"{peak.x:.2f} nm",
+                    hovertext=f"Intensity: {peak.y:.4g}",
+                ),
+            )
+        return fig
 
     return functools.reduce(_add_peak_vline, dfs, fig)
 
 
 def add_FWHM_range(fig: go.Figure, dfs: abc.Iterable[pd.DataFrame]) -> go.Figure:
-    def _add_FWHM_range(fig: go.Figure, df: pd.DataFrame, fillcolor: str) -> go.Figure:
-        half_range = utils.find_half_range(
+    def _add_FWHM_range(fig: go.Figure, df: pd.DataFrame, color: str) -> go.Figure:
+        peaks = utils.find_peaks(
             df["wavelength"].to_list(),
-            df["smoothed_intensity"].to_list(),
+            df["intensity"].to_list(),
         )
-        FWHM = utils.find_FWHM(
-            df["wavelength"].to_list(),
-            df["smoothed_intensity"].to_list(),
-        )
-        return fig.add_vrect(
-            *half_range,
-            fillcolor=fillcolor,
-            opacity=0.10,
-            annotation=dict(
-                text=f"FWHM: {FWHM:.3g} nm",
-                hovertext=""
-                f"Left: {half_range[0]:.2f} nm<br>"
-                f"Right: {half_range[1]:.2f} nm",
-                xanchor="left",
-            ),
-        )
+        for peak in peaks:
+            fig.add_shape(
+                type="line",
+                label=go.layout.shape.Label(text=f"{peak.width:.1f}nm", yanchor="top"),
+                x0=peak.x0,
+                x1=peak.x1,
+                y0=peak.y0,
+                y1=peak.y0,
+                showlegend=False,
+                line=dict(dash="dash", color=color),
+            )
+        return fig
+        # return fig.add_vrect(
+        #     *half_range,
+        #     fillcolor=fillcolor,
+        #     opacity=0.10,
+        #     annotation=dict(
+        #         text=f"FWHM: {FWHM:.3g} nm",
+        #         hovertext=""
+        #         f"Left: {half_range[0]:.2f} nm<br>"
+        #         f"Right: {half_range[1]:.2f} nm",
+        #         xanchor="left",
+        #     ),
+        # )
 
     def _add_FWFM_range_wrapper(
         fig: go.Figure, df_and_color: tuple[pd.DataFrame, str]
     ) -> go.Figure:
-        df, fillcolor = df_and_color
-        return _add_FWHM_range(fig, df, fillcolor)
+        df, color = df_and_color
+        return _add_FWHM_range(fig, df, color)
 
     return functools.reduce(
         _add_FWFM_range_wrapper,
