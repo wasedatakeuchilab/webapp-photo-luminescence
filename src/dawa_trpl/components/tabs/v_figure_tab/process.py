@@ -9,9 +9,8 @@ import plotly.graph_objects as go
 def create_figure(dfs: abc.Iterable[pd.DataFrame], log_y: bool) -> go.Figure:
     dfs = [df.assign(name=df.attrs["filename"]) for df in dfs]
     df = pd.concat(dfs)
-    range_y = np.array(
-        [df["intensity"][np.isclose(df["time"], 0.0)].min(), df["intensity"].max()]
-    )
+    max_intensity = df["intensity"].max()
+    range_y = (0.05 * max_intensity, max_intensity)
     fig = (
         px.line(
             df,
@@ -35,7 +34,7 @@ def create_figure(dfs: abc.Iterable[pd.DataFrame], log_y: bool) -> go.Figure:
         )
         .update_yaxes(
             title_text="<b>Intensity (arb. units)</b>",
-            range=(np.log10(range_y) if log_y else range_y) * [1.0, 1.05],
+            range=(np.log10(range_y) if log_y else range_y) * np.array([1.0, 1.05]),
         )
     )
     return fig

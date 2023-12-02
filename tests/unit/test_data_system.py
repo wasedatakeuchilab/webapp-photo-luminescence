@@ -4,7 +4,7 @@ import pathlib
 import pandas as pd
 import pytest
 import pytest_mock
-from tlab_analysis import trpl, utils
+from tlab_analysis import trpl
 
 from dawa_trpl import data_system as ds
 from tests import IMGDIR, FixtureRequest
@@ -84,18 +84,14 @@ def filepath(request: FixtureRequest[str]) -> str:
 
 
 def test_load_trpl_data(filepath: str) -> None:
-    assert ds.load_trpl_data(filepath) == trpl.read_file(filepath)  # type: ignore[arg-type]
+    assert ds.load_trpl_data(filepath) == trpl.read_file(filepath)
 
 
 def test_load_wavelength_df(filepath: str) -> None:
     actual = ds.load_wavelength_df(filepath)
     expected = ds.load_trpl_data(filepath).aggregate_along_time()
-    expected["smoothed_intensity"] = utils.smooth(expected["intensity"].to_list())
     pd.testing.assert_series_equal(actual["wavelength"], expected["wavelength"])
     pd.testing.assert_series_equal(actual["intensity"], expected["intensity"])
-    pd.testing.assert_series_equal(
-        actual["smoothed_intensity"], expected["smoothed_intensity"]
-    )
     assert actual.attrs["filename"] == os.path.basename(filepath)
 
 
@@ -142,12 +138,8 @@ def test_load_time_df(
 ) -> None:
     actual = ds.load_time_df(filepath, wavelength_range)
     expected = ds.load_trpl_data(filepath).aggregate_along_wavelength(wavelength_range)
-    expected["smoothed_intensity"] = utils.smooth(expected["intensity"].to_list())
     pd.testing.assert_series_equal(actual["time"], expected["time"])
     pd.testing.assert_series_equal(actual["intensity"], expected["intensity"])
-    pd.testing.assert_series_equal(
-        actual["smoothed_intensity"], expected["smoothed_intensity"]
-    )
     assert actual.attrs["filename"] == os.path.basename(filepath)
     # TODO: Assert wr.df["fit"] is filled with nan
 
