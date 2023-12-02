@@ -48,8 +48,6 @@ sidebar = dash.html.Div(
                 dbc.Col(
                     [
                         dash.html.H5("Power Point"),
-                        dash.html.Label("Experiment Date", className="me-2"),
-                        powerpoint.datepicker,
                         powerpoint.download_button,
                     ]
                 ),
