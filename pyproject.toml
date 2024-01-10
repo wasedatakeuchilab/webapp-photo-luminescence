@@ -42,7 +42,7 @@ jupyter = [
   "jupyterlab==4.0.9",
 ]
 uvicorn = [
-  "uvicorn==0.24.0",
+  "uvicorn==0.25.0",
 ]
 
 [tool.hatch.version]
