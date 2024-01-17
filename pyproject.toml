@@ -16,8 +16,8 @@ authors = [
 dependencies = [
   "dash~=2.14.1",
   "dash-bootstrap-components~=1.5.0",
-  "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.4.0",
-  "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.4",
+  "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.5.1",
+  "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.5",
   "asgiref~=3.7.2",
 ]
 dynamic = ["version"]
@@ -25,17 +25,15 @@ dynamic = ["version"]
 [project.urls]
 Documentation = "https://github.com/wasedatakeuchilab/dawa-trpl"
 Homepage = "https://github.com/wasedatakeuchilab/dawa-trpl"
+Repository = "https://github.com/wasedatakeuchilab/dawa-trpl"
 
 [project.optional-dependencies]
 test = [
+  "mypy==1.8.0",
   "pytest==7.4.3",
   "pytest-cov==4.1.0",
   "pytest-describe==2.1.0",
   "pytest-mock==3.12.0",
-]
-mypy = [
-  "mypy==1.8.0",
-  "pandas-stubs==2.1.1.230928",
 ]
 jupyter = [
   "ipywidgets==8.1.1",
@@ -49,7 +47,7 @@ uvicorn = [
 path = "src/dawa_trpl/__init__.py"
 
 [tool.hatch.envs.default]
-features = ["test", "mypy", "jupyter", "uvicorn"]
+features = ["test", "jupyter", "uvicorn"]
 
 [tool.hatch.envs.default.scripts]
 test = "pytest --cov-report=term-missing:skip-covered src tests {args}"
@@ -79,11 +77,16 @@ module = [
 ]
 ignore_missing_imports = true
 
-[tool.isort]
-profile = "black"
-
 [tool.pytest.ini_options]
 addopts = "--cov=dawa_trpl"
 
 [tool.coverage.run]
 omit = ["*/__main__.py"]
+
+[tool.ruff]
+select = [
+  "E",
+  "F",
+  "W",
+  "I",
+]
