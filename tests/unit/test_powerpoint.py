@@ -4,9 +4,9 @@ import pathlib
 import dash
 import pytest
 import pytest_mock
+from dawa_trpl import powerpoint
 from tlab_analysis import trpl
 
-from dawa_trpl import powerpoint
 from tests import IMGDIR, FixtureRequest
 
 
