@@ -37,7 +37,7 @@ test = [
 ]
 jupyter = [
   "ipywidgets==8.1.1",
-  "jupyterlab==4.0.9",
+  "jupyterlab==4.0.10",
 ]
 uvicorn = [
   "uvicorn==0.25.0",
