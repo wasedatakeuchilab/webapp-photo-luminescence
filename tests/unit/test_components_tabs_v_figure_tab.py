@@ -6,9 +6,9 @@ import pandas as pd
 import plotly.graph_objects as go
 import pytest
 import pytest_mock
+from dawa_trpl.components.tabs import v_figure_tab
 from tlab_analysis import trpl
 
-from dawa_trpl.components.tabs import v_figure_tab
 from tests import IMGDIR
 
 
