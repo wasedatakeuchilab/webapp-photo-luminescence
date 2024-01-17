@@ -3,9 +3,9 @@ import pathlib
 import pandas as pd
 import plotly.graph_objects as go
 import pytest
-
 from dawa_trpl import data_system as ds
 from dawa_trpl.components.tabs.h_figure_tab import process
+
 from tests import IMGDIR
 
 
