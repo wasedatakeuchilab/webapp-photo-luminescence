@@ -5,7 +5,6 @@ import dash
 import plotly.graph_objects as go
 import pytest
 import pytest_mock
-
 from dawa_trpl.components.tabs import streak_image_tab
 
 
