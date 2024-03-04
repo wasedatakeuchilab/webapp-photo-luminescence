@@ -14,7 +14,7 @@ authors = [
 # keywords = []
 # classifiers = []
 dependencies = [
-  "dash~=2.14.1",
+  "dash~=2.16.0",
   "dash-bootstrap-components~=1.5.0",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.5.1",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.5",
