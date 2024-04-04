@@ -11,14 +11,17 @@ license = "MIT"
 authors = [
   { name = "Shuhei Nitta", email = "huisintheta@gmail.com" }
 ]
+maintainers = [
+  { name = "Shuhei Nitta", email = "huisintheta@gmail.com" }
+]
 # keywords = []
 # classifiers = []
 dependencies = [
-  "dash~=2.16.1",
-  "dash-bootstrap-components~=1.5.0",
+  "dash==2.16.1",
+  "dash-bootstrap-components==1.5.0",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.5.2",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.6",
-  "asgiref~=3.8.1",
+  "asgiref==3.8.1",
 ]
 dynamic = ["version"]
 
@@ -84,7 +87,7 @@ addopts = "--cov=dawa_trpl"
 omit = ["*/__main__.py"]
 
 [tool.ruff]
-select = [
+lint.select = [
   "E",
   "F",
   "W",
