@@ -17,7 +17,7 @@ maintainers = [
 # keywords = []
 # classifiers = []
 dependencies = [
-  "dash==2.16.1",
+  "dash==2.17.0",
   "dash-bootstrap-components==1.6.0",
   "tlab-analysis @ git+https://github.com/wasedatakeuchilab/tlab-analysis@v0.5.2",
   "tlab-pptx @ git+https://github.com/wasedatakeuchilab/tlab-pptx@v0.1.6",
