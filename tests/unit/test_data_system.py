@@ -4,9 +4,9 @@ import pathlib
 import pandas as pd
 import pytest
 import pytest_mock
-from dawa_trpl import data_system as ds
 from tlab_analysis import trpl
 
+from dawa_trpl import data_system as ds
 from tests import IMGDIR, FixtureRequest
 
 

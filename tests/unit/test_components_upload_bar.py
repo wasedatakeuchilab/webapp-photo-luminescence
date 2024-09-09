@@ -5,8 +5,8 @@ import pathlib
 
 import dash
 import pytest
-from dawa_trpl.components import upload_bar
 
+from dawa_trpl.components import upload_bar
 from tests import IMGDIR, FixtureRequest
 
 
