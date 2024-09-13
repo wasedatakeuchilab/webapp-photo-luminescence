@@ -1,8 +1,8 @@
 import plotly.graph_objects as go
 import pytest
-from dawa_trpl.components.tabs.streak_image_tab import process
 from tlab_analysis import trpl
 
+from dawa_trpl.components.tabs.streak_image_tab import process
 from tests import IMGDIR
 
 
