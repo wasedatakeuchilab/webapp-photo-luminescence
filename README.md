@@ -2,10 +2,10 @@
 
 <p align="center">
 <a href="https://github.com/wasedatakeuchilab/dawa-trpl/actions?query=workflow%3ATest" target="_blank">
-    <img src="https://github.com/wasedatakeuchilab/dawa-trpl/workflows/Test/badge.svg" alt="Test">
+  <img src="https://github.com/wasedatakeuchilab/dawa-trpl/workflows/Test/badge.svg" alt="Test">
 </a>
-<a href="https://codecov.io/gh/wasedatakeuchilab/dawa-trpl" target="_blank">
-    <img src="https://img.shields.io/codecov/c/github/wasedatakeuchilab/dawa-trpl?color=%2334D058" alt="Coverage">
+<a href="https://codecov.io/gh/wasedatakeuchilab/dawa-trpl" >
+  <img src="https://codecov.io/gh/wasedatakeuchilab/dawa-trpl/graph/badge.svg?token=4KEBCYD5T3" alt="Coverage"/>
 </a>
 </p>
 
