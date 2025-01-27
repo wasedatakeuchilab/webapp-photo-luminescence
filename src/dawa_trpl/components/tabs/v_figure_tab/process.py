@@ -21,10 +21,7 @@ def create_figure(dfs: abc.Iterable[pd.DataFrame], log_y: bool) -> go.Figure:
             log_y=log_y,
         )
         .update_traces(
-            hovertemplate=""
-            "Time: %{x:.3g} ns<br>"
-            "Intensity: %{y:.4g}<br>"
-            "<extra></extra>"
+            hovertemplate="Time: %{x:.3g} ns<br>Intensity: %{y:.4g}<br><extra></extra>"
         )
         .update_layout(
             legend=dict(font=dict(size=14), yanchor="top", y=-0.15, xanchor="left", x=0)
